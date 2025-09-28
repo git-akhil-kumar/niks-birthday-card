@@ -25,19 +25,27 @@ let playlist = [];
 function generatePlaylist() {
     // List of all MP3 files in static/songs folder
     const songFiles = [
+        "apna_bana_le.mp3",
+        "dil_diyan_gallan.mp3",
         "falak_tak.mp3",
-        "falak_tak (1).mp3", 
+        "gerua_reverb.mp3",
         "hua_mai_x_finding_her.mp3",
         "Iktara Wake Up Sid 128 Kbps.mp3",
+        "jab_jab_tere_pass.mp3",
         "jana_samjho_na.mp3",
+        "khairiyat_puchho.mp3",
         "lut_gaya.mp3",
         "mehram_animal_2023.mp3",
         "paniyon_sa.mp3",
         "sahiba_aditya_r.mp3",
         "saiyaara.mp3",
         "tera_ban_jaunga.mp3",
+        "tere_hawaale_arijit.mp3",
+        "todhi_jagah_marjava.mp3",
         "tu_hain_toh_main_hoon.mp3",
-        "tu_hain_toh_main_hoon (1).mp3"
+        "tu_hi_yaar_mera.mp3",
+        "tujhe_kitna_chahne.mp3",
+        "tum_hi_aana.mp3"
     ];
     
     playlist = songFiles.map(filename => {
