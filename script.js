@@ -143,13 +143,10 @@ function setupEventListeners() {
     document.addEventListener('keydown', handleKeyboardShortcuts);
 }
 
-// Show specific section with amazing transitions
+// Show specific section with smooth animations
 function showSection(sectionId) {
     // Don't transition if already on the same section
     if (currentSection === sectionId) return;
-    
-    // Show transition overlay
-    showPageTransition();
     
     // Scroll to top first
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -189,30 +186,10 @@ function showSection(sectionId) {
             } else if (sectionId === 'madeby') {
                 animateMadeBySection();
             }
-            
-            // Hide transition overlay
-            hidePageTransition();
         }
     }, 150); // Ultra short transition time
 }
 
-// Show page transition overlay
-function showPageTransition() {
-    const overlay = document.getElementById('pageTransitionOverlay');
-    if (overlay) {
-        overlay.classList.add('active');
-    }
-}
-
-// Hide page transition overlay
-function hidePageTransition() {
-    const overlay = document.getElementById('pageTransitionOverlay');
-    if (overlay) {
-        setTimeout(() => {
-            overlay.classList.remove('active');
-        }, 100); // Ultra short hide time
-    }
-}
 
 // Update active navigation link
 function updateActiveNavLink(activeLink) {
@@ -731,7 +708,7 @@ function showMusicPrompt() {
 
 function showMusicNotification() {
     const notification = document.createElement('div');
-    notification.innerHTML = '🎵 ' + playlist[currentSongIndex].title;
+    notification.innerHTML = '🎵 Now Playing: ' + playlist[currentSongIndex].title;
     notification.style.cssText = `
         position: fixed;
         top: 100px;
@@ -744,7 +721,7 @@ function showMusicNotification() {
         font-size: 0.9rem;
         animation: slideInRight 0.5s ease;
         text-align: center;
-        max-width: 250px;
+        max-width: 300px;
     `;
     
     document.body.appendChild(notification);
