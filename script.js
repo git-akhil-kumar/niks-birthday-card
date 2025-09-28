@@ -143,36 +143,74 @@ function setupEventListeners() {
     document.addEventListener('keydown', handleKeyboardShortcuts);
 }
 
-// Show specific section
+// Show specific section with amazing transitions
 function showSection(sectionId) {
+    // Don't transition if already on the same section
+    if (currentSection === sectionId) return;
+    
+    // Show transition overlay
+    showPageTransition();
+    
     // Scroll to top first
     window.scrollTo({ top: 0, behavior: 'smooth' });
     
-    // Hide all sections
-    const sections = document.querySelectorAll('.section');
-    sections.forEach(section => {
-        section.classList.remove('active');
-    });
+    // Add leaving animation to current section
+    const currentActiveSection = document.querySelector('.section.active');
+    if (currentActiveSection) {
+        currentActiveSection.classList.add('leaving');
+    }
+    
+    // Wait for leaving animation to complete
+    setTimeout(() => {
+        // Hide all sections
+        const sections = document.querySelectorAll('.section');
+        sections.forEach(section => {
+            section.classList.remove('active', 'leaving');
+        });
 
-    // Show target section
-    const targetSection = document.getElementById(sectionId);
-    if (targetSection) {
-        targetSection.classList.add('active');
-        currentSection = sectionId;
-        
-        // Add entrance animation
-        targetSection.style.animation = 'slideInUp 0.6s ease';
-        
-        // Special effects for different sections
-        if (sectionId === 'home') {
-            createConfetti();
-        } else if (sectionId === 'memories') {
-            animateMemoryCards();
-        } else if (sectionId === 'wishes') {
-            animateWishCards();
-        } else if (sectionId === 'madeby') {
-            animateMadeBySection();
+        // Show target section
+        const targetSection = document.getElementById(sectionId);
+        if (targetSection) {
+            targetSection.classList.add('active');
+            currentSection = sectionId;
+            
+            // Add entrance animation
+            targetSection.style.animation = 'none';
+            targetSection.offsetHeight; // Trigger reflow
+            targetSection.style.animation = null;
+            
+            // Special effects for different sections
+            if (sectionId === 'home') {
+                createConfetti();
+            } else if (sectionId === 'memories') {
+                animateMemoryCards();
+            } else if (sectionId === 'wishes') {
+                animateWishCards();
+            } else if (sectionId === 'madeby') {
+                animateMadeBySection();
+            }
+            
+            // Hide transition overlay
+            hidePageTransition();
         }
+    }, 150); // Ultra short transition time
+}
+
+// Show page transition overlay
+function showPageTransition() {
+    const overlay = document.getElementById('pageTransitionOverlay');
+    if (overlay) {
+        overlay.classList.add('active');
+    }
+}
+
+// Hide page transition overlay
+function hidePageTransition() {
+    const overlay = document.getElementById('pageTransitionOverlay');
+    if (overlay) {
+        setTimeout(() => {
+            overlay.classList.remove('active');
+        }, 100); // Ultra short hide time
     }
 }
 
@@ -693,7 +731,7 @@ function showMusicPrompt() {
 
 function showMusicNotification() {
     const notification = document.createElement('div');
-    notification.innerHTML = '🎵 Now Playing: ' + playlist[currentSongIndex].title + '<br><small>by ' + playlist[currentSongIndex].artist + '</small>';
+    notification.innerHTML = '🎵 ' + playlist[currentSongIndex].title;
     notification.style.cssText = `
         position: fixed;
         top: 100px;
