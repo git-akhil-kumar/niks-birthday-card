@@ -5,7 +5,7 @@ let a=0,b=!1,c=null,d='home',e=null,f=!1,g=!1,h=null,i=[];
 const j=window.location.hostname==='localhost'||window.location.hostname==='127.0.0.1'||window.location.hostname==='';
 
 // Console logging function - only logs in local development
-function k(...l){if(j){console.log(...l)}}
+function k(...l){if(j){console.k(...l)}}
 
 // Dynamic Songs Playlist - Auto-discovered from static/songs folder
 let m=[];
@@ -78,11 +78,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Initialize the application
 function initializeApp() {
-    audioPlayer = document.getElementById('audioPlayer');
-    if (audioPlayer) {
-        audioPlayer.volume = 1; // Set initial volume
+    c = document.getElementById('c');
+    if (c) {
+        c.volume = 1; // Set initial volume
     }
-    generatePlaylist(); // Generate playlist from available songs
+    n(); // Generate playlist from available songs
     showSection('home');
 }
 
@@ -116,17 +116,6 @@ function setupEventListeners() {
 
     // Memory cards - removed click functionality for details
 
-    // Back button
-    const backBtn = document.getElementById('backBtn');
-    if (backBtn) {
-        backBtn.addEventListener('click', goBack);
-    }
-
-    // Auto rotate button
-    const autoBtn = document.getElementById('autoBtn');
-    if (autoBtn) {
-        autoBtn.addEventListener('click', toggleAutoRotate);
-    }
 
     // Add click listener to document for first interaction
     document.addEventListener('click', handleFirstUserInteraction, { once: true });
@@ -134,9 +123,9 @@ function setupEventListeners() {
     document.addEventListener('touchstart', handleFirstUserInteraction, { once: true });
 
     // Audio player events
-    if (audioPlayer) {
-        audioPlayer.addEventListener('ended', nextSong);
-        audioPlayer.addEventListener('timeupdate', updateProgress);
+    if (c) {
+        c.addEventListener('ended', nextSong);
+        c.addEventListener('timeupdate', updateProgress);
     }
 
     // Keyboard shortcuts
@@ -158,7 +147,7 @@ function showSection(sectionId) {
     const targetSection = document.getElementById(sectionId);
     if (targetSection) {
         targetSection.classList.add('active');
-        currentSection = sectionId;
+        d = sectionId;
         
         // Add entrance animation
         targetSection.style.animation = 'slideInUp 0.6s ease';
@@ -187,96 +176,96 @@ function updateActiveNavLink(activeLink) {
 
 // Music Player Functions
 function togglePlayPause() {
-    if (isPlaying) {
+    if (b) {
         pauseSong();
     } else {
-        playSong(currentSongIndex);
+        playSong(a);
     }
 }
 
 function playSong(index) {
-    if (index >= 0 && index < playlist.length) {
-        currentSongIndex = index;
-        const song = playlist[index];
+    if (index >= 0 && index < m.length) {
+        a = index;
+        const song = m[index];
         
         // Set audio source and play
-        if (audioPlayer) {
-            audioPlayer.src = song.url;
+        if (c) {
+            c.src = song.url;
             
-            if (hasUserInteracted) {
+            if (g) {
                 // User has interacted, we can play audio
-                audioPlayer.play().then(() => {
-                    isPlaying = true;
+                c.play().then(() => {
+                    b = true;
                     updatePlayButton();
                     showMusicNotification();
-                    log('Successfully playing:', song.title);
+                    k('Successfully playing:', song.title);
                     
                     // Set up 20-second timer to advance to next song
                     setTimeout(() => {
-                        if (isPlaying) {
+                        if (b) {
                             nextSong();
                         }
                     }, 20000); // 20 seconds
                     
                 }).catch(error => {
-                    log('Audio play failed:', error);
+                    k('Audio play failed:', error);
                     // Try to play again after a short delay
                     setTimeout(() => {
-                        audioPlayer.play().then(() => {
-                            isPlaying = true;
+                        c.play().then(() => {
+                            b = true;
                             updatePlayButton();
                             showMusicNotification();
                             
                             // Set up 20-second timer to advance to next song
                             setTimeout(() => {
-                                if (isPlaying) {
+                                if (b) {
                                     nextSong();
                                 }
                             }, 20000); // 20 seconds
                             
                         }).catch(err => {
-                            log('Retry failed:', err);
+                            k('Retry failed:', err);
                             showMusicNotification();
                         });
                     }, 500);
                 });
             } else {
                 // Store the song to play after user interaction
-                pendingSongIndex = index;
-                log('Music queued for after user interaction:', song.title);
+                h = index;
+                k('Music queued for after user interaction:', song.title);
             }
         }
     }
 }
 
 function pauseSong() {
-    if (audioPlayer) {
-        audioPlayer.pause();
-        isPlaying = false;
+    if (c) {
+        c.pause();
+        b = false;
         updatePlayButton();
     }
 }
 
 function nextSong() {
-    if (playlist.length === 0) return;
+    if (m.length === 0) return;
     
     // Fade out current song smoothly
-    if (audioPlayer && isPlaying) {
+    if (c && b) {
         const fadeOutInterval = setInterval(() => {
-            if (audioPlayer.volume > 0.1) {
-                audioPlayer.volume -= 0.1;
+            if (c.volume > 0.1) {
+                c.volume -= 0.1;
             } else {
-                audioPlayer.volume = 0;
+                c.volume = 0;
                 clearInterval(fadeOutInterval);
                 
                 // Reset volume for next song
-                audioPlayer.volume = 1;
+                c.volume = 1;
                 
                 // Play next random song with equal probability, avoiding recent repeats
                 const randomIndex = getRandomSongIndex();
                 playSong(randomIndex);
                 
-                log(`Next random song: ${playlist[randomIndex].title}`);
+                k(`Next random song: ${m[randomIndex].title}`);
             }
         }, 50);
     } else {
@@ -284,28 +273,28 @@ function nextSong() {
         const randomIndex = getRandomSongIndex();
         playSong(randomIndex);
         
-        log(`Next random song: ${playlist[randomIndex].title}`);
+        k(`Next random song: ${m[randomIndex].title}`);
     }
 }
 
 function previousSong() {
-    if (playlist.length === 0) return;
+    if (m.length === 0) return;
     
     // Play previous random song with equal probability, avoiding recent repeats
     const randomIndex = getRandomSongIndex();
     playSong(randomIndex);
     
-    log(`Previous random song: ${playlist[randomIndex].title}`);
+    k(`Previous random song: ${m[randomIndex].title}`);
 }
 
 function shufflePlaylist() {
-    if (playlist.length === 0) return;
+    if (m.length === 0) return;
     
     // Select a completely random song with equal probability
-    const randomIndex = Math.floor(Math.random() * playlist.length);
+        const randomIndex = Math.floor(Math.random() * m.length);
     playSong(randomIndex);
     
-    log(`Shuffled to random song: ${playlist[randomIndex].title}`);
+    k(`Shuffled to random song: ${m[randomIndex].title}`);
     
     // Visual feedback
     const shuffleBtn = document.querySelector('.shuffle-btn');
@@ -320,7 +309,7 @@ function shufflePlaylist() {
 function updatePlayButton() {
     const playBtn = document.querySelector('.play-btn i');
     if (playBtn) {
-        playBtn.className = isPlaying ? 'fas fa-pause' : 'fas fa-play';
+        playBtn.className = b ? 'fas fa-pause' : 'fas fa-play';
     }
 }
 
@@ -399,10 +388,10 @@ function startCelebration() {
     createConfetti();
     
     // Play celebration sound (if available)
-    if (audioPlayer) {
-        audioPlayer.src = "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav";
-        audioPlayer.play().catch(() => {
-            console.log('Celebration sound not available');
+    if (c) {
+        c.src = "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav";
+        c.play().catch(() => {
+            console.k('Celebration sound not available');
         });
     }
     
@@ -441,7 +430,7 @@ function showCelebrationMessage() {
 
 // Back button function
 function goBack() {
-    if (currentSection !== 'home') {
+    if (d !== 'home') {
         showSection('home');
         updateActiveNavLink(document.querySelector('.nav-link[href="#home"]'));
     }
@@ -449,23 +438,23 @@ function goBack() {
 
 // Auto-rotation functions
 function startAutoRotate() {
-    isAutoRotating = true;
+    f = true;
     const autoBtn = document.querySelector('.auto-rotate-btn');
     if (autoBtn) {
         autoBtn.classList.add('active');
     }
     
-    autoRotateInterval = setInterval(() => {
-        if (currentSection === 'home') {
+    e = setInterval(() => {
+        if (d === 'home') {
             showSection('memories');
             updateActiveNavLink(document.querySelector('.nav-link[href="#memories"]'));
-        } else if (currentSection === 'memories') {
+        } else if (d === 'memories') {
             showSection('wishes');
             updateActiveNavLink(document.querySelector('.nav-link[href="#wishes"]'));
-        } else if (currentSection === 'wishes') {
+        } else if (d === 'wishes') {
             showSection('madeby');
             updateActiveNavLink(document.querySelector('.nav-link[href="#madeby"]'));
-        } else if (currentSection === 'madeby') {
+        } else if (d === 'madeby') {
             showSection('home');
             updateActiveNavLink(document.querySelector('.nav-link[href="#home"]'));
         }
@@ -473,20 +462,20 @@ function startAutoRotate() {
 }
 
 function stopAutoRotate() {
-    isAutoRotating = false;
+    f = false;
     const autoBtn = document.querySelector('.auto-rotate-btn');
     if (autoBtn) {
         autoBtn.classList.remove('active');
     }
     
-    if (autoRotateInterval) {
-        clearInterval(autoRotateInterval);
-        autoRotateInterval = null;
+    if (e) {
+        clearInterval(e);
+        e = null;
     }
 }
 
 function toggleAutoRotate() {
-    if (isAutoRotating) {
+    if (f) {
         stopAutoRotate();
     } else {
         startAutoRotate();
@@ -531,22 +520,22 @@ function handleKeyboardShortcuts(e) {
     switch(e.key) {
         case ' ':
             e.preventDefault();
-            if (currentSection === 'music') {
+            if (d === 'music') {
                 togglePlayPause();
             }
             break;
         case 'ArrowRight':
-            if (currentSection === 'music') {
+            if (d === 'music') {
                 nextSong();
             }
             break;
         case 'ArrowLeft':
-            if (currentSection === 'music') {
+            if (d === 'music') {
                 previousSong();
             }
             break;
         case 's':
-            if (currentSection === 'music') {
+            if (d === 'music') {
                 shufflePlaylist();
             }
             break;
@@ -555,9 +544,9 @@ function handleKeyboardShortcuts(e) {
 
 // Handle first user interaction to start music
 function handleFirstUserInteraction() {
-    if (!hasUserInteracted) {
-        hasUserInteracted = true;
-        log('User interaction detected - starting music');
+    if (!g) {
+        g = true;
+        k('User interaction detected - starting music');
         
         // Remove the birthday prompt with animation
         const prompt = document.querySelector('.birthday-prompt');
@@ -586,25 +575,25 @@ function handleFirstUserInteraction() {
 // Auto-play random music with equal probability
 function startRandomMusic() {
     if (playlist.length === 0) {
-        log('No songs available in playlist');
+        k('No songs available in playlist');
         return;
     }
     
     // Select a random song with equal probability
-    const randomIndex = Math.floor(Math.random() * playlist.length);
-    currentSongIndex = randomIndex;
+        const randomIndex = Math.floor(Math.random() * m.length);
+    a = randomIndex;
     
-    log(`Playing random song ${currentSongIndex + 1}/${playlist.length}: ${playlist[currentSongIndex].title}`);
+    k(`Playing random song ${a + 1}/${m.length}: ${m[a].title}`);
     
     // Start playing
-    playSong(currentSongIndex);
+    playSong(a);
     
     // Show a subtle notification
     showMusicNotification();
     
     // Set up auto-advance to next song
-    if (audioPlayer) {
-        audioPlayer.addEventListener('ended', () => {
+    if (c) {
+        c.addEventListener('ended', () => {
             nextSong();
         });
     }
@@ -680,7 +669,7 @@ function showMusicPrompt() {
     
     // Auto-remove after 8 seconds if no interaction
     setTimeout(() => {
-        if (prompt.parentNode && !hasUserInteracted) {
+        if (prompt.parentNode && !g) {
             prompt.style.animation = 'fadeOut 0.5s ease';
             setTimeout(() => {
                 if (prompt.parentNode) {
@@ -693,7 +682,7 @@ function showMusicPrompt() {
 
 function showMusicNotification() {
     const notification = document.createElement('div');
-    notification.innerHTML = '🎵 Now Playing: ' + playlist[currentSongIndex].title + '<br><small>by ' + playlist[currentSongIndex].artist + '</small>';
+    notification.innerHTML = '🎵 Now Playing: ' + m[a].title + '<br><small>by ' + m[a].artist + '</small>';
     notification.style.cssText = `
         position: fixed;
         top: 100px;
