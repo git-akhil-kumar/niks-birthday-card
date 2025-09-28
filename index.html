@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday! 🎉</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Dancing+Script:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Background Elements -->
+    <div class="bg-elements">
+        <div class="floating-hearts"></div>
+        <div class="sparkles"></div>
+        <div class="confetti-container"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-heart"></i>
+                <span>Birthday Special</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#home" class="nav-link active">Home</a></li>
+                <li><a href="#memories" class="nav-link">Memories</a></li>
+                <li><a href="#wishes" class="nav-link">Wishes</a></li>
+                <li><button class="back-btn" onclick="goBack()">
+                    <i class="fas fa-arrow-left"></i>
+                    Back
+                </button></li>
+                <li><button class="auto-rotate-btn" onclick="toggleAutoRotate()">
+                    <i class="fas fa-sync-alt"></i>
+                    Auto
+                </button></li>
+            </ul>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Home Section -->
+        <section id="home" class="section active">
+            <div class="hero-container">
+                <div class="hero-content">
+                    <div class="birthday-card">
+                        <div class="card-inner">
+                            <div class="card-front">
+                                <div class="card-header">
+                                    <h1 class="birthday-title">
+                                        <span class="title-line">Happy</span>
+                                        <span class="title-line">Birthday!</span>
+                                    </h1>
+                                    <div class="birthday-icon">
+                                        <i class="fas fa-birthday-cake"></i>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="her-photo-container">
+                                        <img src="static/her-images/2482db68-3859-4e90-aa51-b05dad4ea457.jpg" alt="Birthday Girl" class="her-photo">
+                                    </div>
+                                    <p class="birthday-message">
+                                        Wishing you a day filled with love, laughter, and all your favorite Bollywood songs! 🎵
+                                    </p>
+                                    <div class="blessings-container">
+                                        <div class="blessing-item">
+                                            <span class="blessing-emoji">🎭</span>
+                                            <span class="blessing-text">May your life be more dramatic than Bigg Boss 19! (But in a good way!)</span>
+                                        </div>
+                                        <div class="blessing-item">
+                                            <span class="blessing-emoji">🍿</span>
+                                            <span class="blessing-text">May you always have the best seat in the house, just like Salman Khan!</span>
+                                        </div>
+                                        <div class="blessing-item">
+                                            <span class="blessing-emoji">💃</span>
+                                            <span class="blessing-text">May you dance through life like a Bollywood heroine!</span>
+                                        </div>
+                                        <div class="blessing-item">
+                                            <span class="blessing-emoji">🎪</span>
+                                            <span class="blessing-text">May your year be more entertaining than Bigg Boss 18!</span>
+                                        </div>
+                                        <div class="blessing-item">
+                                            <span class="blessing-emoji">🎬</span>
+                                            <span class="blessing-text">May every day be a blockbuster hit!</span>
+                                        </div>
+                                        <div class="blessing-item">
+                                            <span class="blessing-emoji">🌟</span>
+                                            <span class="blessing-text">May you shine brighter than the Bigg Boss trophy!</span>
+                                        </div>
+                                    </div>
+                                    <div class="celebration-emoji">
+                                        <span>🎉</span>
+                                        <span>🎊</span>
+                                        <span>🎈</span>
+                                        <span>🎁</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-back">
+                                <div class="surprise-content">
+                                    <h2>Surprise! 🎁</h2>
+                                    <p>Music is playing automatically! Enjoy the celebration!</p>
+                                    <button class="surprise-btn" onclick="startCelebration()">
+                                        <i class="fas fa-heart"></i>
+                                        Start Party!
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+        </section>
+
+        <!-- Memories Section -->
+        <section id="memories" class="section">
+            <div class="memories-container">
+                <h2 class="section-title">Our Beautiful Memories 💕</h2>
+                <div class="memories-grid">
+                    <div class="memory-card" data-memory="1">
+                        <div class="memory-image">
+                            <img src="static/our-images/4e39bba8-7d28-4ed8-95e1-fff4eb061999.jpg" alt="Memory 1" class="memory-photo">
+                        </div>
+                        <div class="memory-content">
+                            <h3>Beautiful Moment</h3>
+                            <p class="memory-date">Sep 28, 2025</p>
+                        </div>
+                    </div>
+                    <div class="memory-card" data-memory="2">
+                        <div class="memory-image">
+                            <img src="static/our-images/cute-hand-picture.jpg" alt="Memory 2" class="memory-photo">
+                        </div>
+                        <div class="memory-content">
+                            <h3>Sweet Gesture</h3>
+                            <p class="memory-date">Sep 28, 2025</p>
+                        </div>
+                    </div>
+                    <div class="memory-card" data-memory="3">
+                        <div class="memory-image">
+                            <img src="static/our-images/IMG_1303.JPG" alt="Memory 3" class="memory-photo">
+                        </div>
+                        <div class="memory-content">
+                            <h3>Adventure Time</h3>
+                            <p class="memory-date">Sep 15, 2025</p>
+                        </div>
+                    </div>
+                    <div class="memory-card" data-memory="4">
+                        <div class="memory-image">
+                            <img src="static/our-images/IMG_1466.jpg" alt="Memory 4" class="memory-photo">
+                        </div>
+                        <div class="memory-content">
+                            <h3>Special Day</h3>
+                            <p class="memory-date">Sep 17, 2025</p>
+                        </div>
+                    </div>
+                    <div class="memory-card" data-memory="5">
+                        <div class="memory-image">
+                            <img src="static/our-images/IMG_1472.jpg" alt="Memory 5" class="memory-photo">
+                        </div>
+                        <div class="memory-content">
+                            <h3>Memorable Time</h3>
+                            <p class="memory-date">Sep 17, 2025</p>
+                        </div>
+                    </div>
+                    <div class="memory-card" data-memory="6">
+                        <div class="memory-image">
+                            <img src="static/our-images/IMG_1865.jpg" alt="Memory 6" class="memory-photo">
+                        </div>
+                        <div class="memory-content">
+                            <h3>Perfect Moment</h3>
+                            <p class="memory-date">Sep 27, 2025</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Wishes Section -->
+        <section id="wishes" class="section">
+            <div class="wishes-container">
+                <h2 class="section-title">Birthday Wishes ✨</h2>
+                <div class="wishes-content">
+                    <div class="wish-card">
+                        <div class="wish-icon">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <h3>Love & Happiness</h3>
+                        <p>May your special day be filled with endless love, joy, and happiness that lasts throughout the year!</p>
+                    </div>
+                    <div class="wish-card">
+                        <div class="wish-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <h3>Dreams Come True</h3>
+                        <p>Wishing all your dreams and aspirations come true this year. You deserve every bit of success and happiness!</p>
+                    </div>
+                    <div class="wish-card">
+                        <div class="wish-icon">
+                            <i class="fas fa-music"></i>
+                        </div>
+                        <h3>Musical Journey</h3>
+                        <p>May your life be like a beautiful Bollywood song - full of romance, drama, and a happy ending!</p>
+                    </div>
+                    <div class="wish-card">
+                        <div class="wish-icon">
+                            <i class="fas fa-cake"></i>
+                        </div>
+                        <h3>Sweet Moments</h3>
+                        <p>Here's to another year of sweet moments, wonderful memories, and amazing adventures together!</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Audio Element -->
+    <audio id="audioPlayer" preload="metadata">
+        <source src="" type="audio/mpeg">
+    </audio>
+
+    <!-- Scripts -->
+    <script src="script.js"></script>
+</body>
+</html>

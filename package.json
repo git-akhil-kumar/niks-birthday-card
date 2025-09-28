@@ -1,0 +1,30 @@
+{
+  "name": "birthday-card-website",
+  "version": "1.0.0",
+  "description": "A beautiful birthday card website with Bollywood music and animations",
+  "main": "index.html",
+  "scripts": {
+    "start": "python3 -m http.server 8000",
+    "dev": "python3 -m http.server 8000",
+    "build": "echo 'No build step required for static site'",
+    "deploy": "echo 'Deploy via GitHub Actions'"
+  },
+  "keywords": [
+    "birthday",
+    "card",
+    "website",
+    "bollywood",
+    "music",
+    "animations"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/birthday-card-website.git"
+  },
+  "homepage": "https://your-domain.com",
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
