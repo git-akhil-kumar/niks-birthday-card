@@ -1,81 +1,69 @@
 // Global Variables
-let currentSongIndex = 0;
-let isPlaying = false;
-let audioPlayer = null;
-let currentSection = 'home';
-let autoRotateInterval = null;
-let isAutoRotating = false;
-let hasUserInteracted = false;
-let pendingSongIndex = null;
+let a=0,b=!1,c=null,d='home',e=null,f=!1,g=!1,h=null,i=[];
 
 // Environment detection
-const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname === '';
+const j=window.location.hostname==='localhost'||window.location.hostname==='127.0.0.1'||window.location.hostname==='';
 
 // Console logging function - only logs in local development
-function log(...args) {
-    if (isLocal) {
-        console.log(...args);
-    }
-}
+function k(...l){if(j){console.log(...l)}}
 
 // Dynamic Songs Playlist - Auto-discovered from static/songs folder
-let playlist = [];
+let m=[];
 
 // Function to generate playlist from available MP3 files
-function generatePlaylist() {
-    // List of all MP3 files in static/songs folder
-    const songFiles = [
+function n(){
+    const o=[
+        "akhiyan_gulab2.mp3",
         "apna_bana_le.mp3",
         "atif_aslam_new.mp3",
         "dil_diyan_gallan.mp3",
         "falak_tak.mp3",
         "gerua_reverb.mp3",
+        "girl_i_need_you.mp3",
+        "ha_ham_badalna_laga.mp3",
         "hua_mai_x_finding_her.mp3",
         "Iktara Wake Up Sid 128 Kbps.mp3",
+        "ishq_bulaava_bollywood.mp3",
         "jab_jab_tere_pass.mp3",
         "jana_samjho_na.mp3",
         "khairiyat_puchho.mp3",
         "kon_tujhe_peyar_kare.mp3",
         "lut_gaya.mp3",
         "main_shaas_bhi_lu.mp3",
+        "man_mera.mp3",
         "mehram_animal_2023.mp3",
         "paniyon_sa.mp3",
+        "ride_it_hindi.mp3",
         "sahiba_aditya_r.mp3",
         "saiyaara.mp3",
         "tera_ban_jaunga.mp3",
         "tere_hawaale_arijit.mp3",
+        "teri_ban_jaungi.mp3",
         "todhi_jagah_marjava.mp3",
         "tu_hain_toh_main_hoon.mp3",
         "tu_hi_yaar_mera.mp3",
+        "tuhi_haqeeqat.mp3",
         "tujhe_kitna_chahne.mp3",
-        "tum_hi_aana.mp3"
+        "tum_hi_aana.mp3",
+        "tum_jo_aaye.mp3"
     ];
     
-    playlist = songFiles.map(filename => {
+    m=o.map(p=>{
         // Extract song title from filename
-        let title = filename.replace('.mp3', '').replace('_', ' ').replace(' (1)', '');
+        let q=p.replace('.mp3','').replace('_',' ').replace(' (1)','');
         
-        // Clean up title formatting
-        title = title.split(' ').map(word => 
-            word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-        ).join(' ');
+        q=q.split(' ').map(r=>r.charAt(0).toUpperCase()+r.slice(1).toLowerCase()).join(' ');
         
-        // Handle special cases
-        if (title.includes('Iktara')) title = 'Iktara - Wake Up Sid';
-        if (title.includes('Mehram')) title = 'Mehram - Animal 2023';
-        if (title.includes('Sahiba')) title = 'Sahiba - Aditya R';
-        if (title.includes('Hua Mai')) title = 'Hua Mai - Finding Her';
+        if(q.includes('Iktara'))q='Iktara - Wake Up Sid';
+        if(q.includes('Mehram'))q='Mehram - Animal 2023';
+        if(q.includes('Sahiba'))q='Sahiba - Aditya R';
+        if(q.includes('Hua Mai'))q='Hua Mai - Finding Her';
         
-        return {
-            title: title,
-            artist: "Bollywood",
-            duration: "4:00", // Default duration
-            url: `static/songs/${filename}`
-        };
+        return{title:q,artist:"Bollywood",duration:"4:00",url:`static/songs/${p}`};
     });
     
-    log(`Generated playlist with ${playlist.length} songs:`, playlist.map(s => s.title));
-    return playlist;
+    k(`Generated playlist with ${m.length} songs:`,m.map(s=>s.title));
+    return m;
 }
 
 // Initialize the application
@@ -127,6 +115,18 @@ function setupEventListeners() {
     });
 
     // Memory cards - removed click functionality for details
+
+    // Back button
+    const backBtn = document.getElementById('backBtn');
+    if (backBtn) {
+        backBtn.addEventListener('click', goBack);
+    }
+
+    // Auto rotate button
+    const autoBtn = document.getElementById('autoBtn');
+    if (autoBtn) {
+        autoBtn.addEventListener('click', toggleAutoRotate);
+    }
 
     // Add click listener to document for first interaction
     document.addEventListener('click', handleFirstUserInteraction, { once: true });
@@ -272,8 +272,8 @@ function nextSong() {
                 // Reset volume for next song
                 audioPlayer.volume = 1;
                 
-                // Play next random song with equal probability
-                const randomIndex = Math.floor(Math.random() * playlist.length);
+                // Play next random song with equal probability, avoiding recent repeats
+                const randomIndex = getRandomSongIndex();
                 playSong(randomIndex);
                 
                 log(`Next random song: ${playlist[randomIndex].title}`);
@@ -281,7 +281,7 @@ function nextSong() {
         }, 50);
     } else {
         // If no audio player or not playing, just advance
-        const randomIndex = Math.floor(Math.random() * playlist.length);
+        const randomIndex = getRandomSongIndex();
         playSong(randomIndex);
         
         log(`Next random song: ${playlist[randomIndex].title}`);
@@ -291,8 +291,8 @@ function nextSong() {
 function previousSong() {
     if (playlist.length === 0) return;
     
-    // Play previous random song with equal probability
-    const randomIndex = Math.floor(Math.random() * playlist.length);
+    // Play previous random song with equal probability, avoiding recent repeats
+    const randomIndex = getRandomSongIndex();
     playSong(randomIndex);
     
     log(`Previous random song: ${playlist[randomIndex].title}`);
