@@ -835,8 +835,10 @@ main {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 80vh;
-    padding: 2rem 0;
+    min-height: 100vh;
+    padding: 2rem;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .made-by-card {
@@ -852,6 +854,8 @@ main {
     position: relative;
     overflow: hidden;
     animation: slideInUp 0.8s ease;
+    margin: 0 auto;
+    box-sizing: border-box;
 }
 
 .made-by-card::before {
@@ -1106,9 +1110,16 @@ main {
         font-size: 2rem;
     }
 
+    .made-by-container {
+        padding: 1rem;
+        min-height: 100vh;
+    }
+
     .made-by-card {
-        padding: 2rem;
-        margin: 1rem;
+        padding: 2rem 1.5rem;
+        margin: 0;
+        max-width: 100%;
+        width: 100%;
     }
 
     .made-by-title {
@@ -1119,12 +1130,29 @@ main {
         font-size: 1.5rem;
     }
 
+    .creator-photo {
+        width: 120px;
+        height: 120px;
+    }
+
     .love-details {
         gap: 0.8rem;
     }
 
     .love-item {
         padding: 0.6rem;
+        font-size: 0.9rem;
+        flex-direction: column;
+        text-align: center;
+        gap: 0.5rem;
+    }
+
+    .love-item i {
+        font-size: 1.5rem;
+    }
+
+    .signature {
+        padding: 1rem;
         font-size: 0.9rem;
     }
 
@@ -1163,7 +1191,46 @@ main {
 
     .action-btn {
         min-width: 200px;
-        padding: 0.8rem 1.5rem;
+    }
+
+    .made-by-container {
+        padding: 0.5rem;
+    }
+
+    .made-by-card {
+        padding: 1.5rem 1rem;
+        border-radius: 20px;
+    }
+
+    .made-by-title {
+        font-size: 2rem;
+    }
+
+    .creator-name {
+        font-size: 1.3rem;
+    }
+
+    .creator-photo {
+        width: 100px;
+        height: 100px;
+    }
+
+    .love-message {
+        font-size: 1.1rem;
+    }
+
+    .love-item {
+        padding: 0.5rem;
+        font-size: 0.8rem;
+    }
+
+    .love-item i {
+        font-size: 1.2rem;
+    }
+
+    .signature {
+        padding: 0.8rem;
+        font-size: 0.8rem;
     }
 
     .memories-container,
