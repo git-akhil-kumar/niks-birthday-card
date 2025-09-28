@@ -195,12 +195,12 @@ function playSong(index) {
                     showMusicNotification();
                     log('Successfully playing:', song.title);
                     
-                    // Set up 10-second timer to advance to next song
+                    // Set up 20-second timer to advance to next song
                     setTimeout(() => {
                         if (isPlaying) {
                             nextSong();
                         }
-                    }, 10000); // 10 seconds
+                    }, 20000); // 20 seconds
                     
                 }).catch(error => {
                     log('Audio play failed:', error);
@@ -211,12 +211,12 @@ function playSong(index) {
                             updatePlayButton();
                             showMusicNotification();
                             
-                            // Set up 10-second timer to advance to next song
+                            // Set up 20-second timer to advance to next song
                             setTimeout(() => {
                                 if (isPlaying) {
                                     nextSong();
                                 }
-                            }, 10000); // 10 seconds
+                            }, 20000); // 20 seconds
                             
                         }).catch(err => {
                             log('Retry failed:', err);
@@ -444,10 +444,13 @@ function startAutoRotate() {
             showSection('memories');
             updateActiveNavLink(document.querySelector('.nav-link[href="#memories"]'));
         } else if (currentSection === 'memories') {
+            showSection('wishes');
+            updateActiveNavLink(document.querySelector('.nav-link[href="#wishes"]'));
+        } else if (currentSection === 'wishes') {
             showSection('home');
             updateActiveNavLink(document.querySelector('.nav-link[href="#home"]'));
         }
-    }, 5000); // 5 seconds
+    }, 6000); // 6 seconds
 }
 
 function stopAutoRotate() {
