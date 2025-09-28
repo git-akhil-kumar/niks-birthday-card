@@ -145,6 +145,9 @@ function setupEventListeners() {
 
 // Show specific section
 function showSection(sectionId) {
+    // Scroll to top first
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
     // Hide all sections
     const sections = document.querySelectorAll('.section');
     sections.forEach(section => {
