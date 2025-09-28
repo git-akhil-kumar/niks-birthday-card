@@ -1,69 +1,81 @@
 // Global Variables
-let a=0,b=!1,c=null,d='home',e=null,f=!1,g=!1,h=null,i=[];
+let currentSongIndex = 0;
+let isPlaying = false;
+let audioPlayer = null;
+let currentSection = 'home';
+let autoRotateInterval = null;
+let isAutoRotating = false;
+let hasUserInteracted = false;
+let pendingSongIndex = null;
 
 // Environment detection
-const j=window.location.hostname==='localhost'||window.location.hostname==='127.0.0.1'||window.location.hostname==='';
+const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname === '';
 
 // Console logging function - only logs in local development
-function k(...l){if(j){console.k(...l)}}
+function log(...args) {
+    if (isLocal) {
+        console.log(...args);
+    }
+}
 
 // Dynamic Songs Playlist - Auto-discovered from static/songs folder
-let m=[];
+let playlist = [];
 
 // Function to generate playlist from available MP3 files
-function n(){
-    const o=[
-        "akhiyan_gulab2.mp3",
+function generatePlaylist() {
+    // List of all MP3 files in static/songs folder
+    const songFiles = [
         "apna_bana_le.mp3",
         "atif_aslam_new.mp3",
         "dil_diyan_gallan.mp3",
         "falak_tak.mp3",
         "gerua_reverb.mp3",
-        "girl_i_need_you.mp3",
-        "ha_ham_badalna_laga.mp3",
         "hua_mai_x_finding_her.mp3",
         "Iktara Wake Up Sid 128 Kbps.mp3",
-        "ishq_bulaava_bollywood.mp3",
         "jab_jab_tere_pass.mp3",
         "jana_samjho_na.mp3",
         "khairiyat_puchho.mp3",
         "kon_tujhe_peyar_kare.mp3",
         "lut_gaya.mp3",
         "main_shaas_bhi_lu.mp3",
-        "man_mera.mp3",
         "mehram_animal_2023.mp3",
         "paniyon_sa.mp3",
-        "ride_it_hindi.mp3",
         "sahiba_aditya_r.mp3",
         "saiyaara.mp3",
         "tera_ban_jaunga.mp3",
         "tere_hawaale_arijit.mp3",
-        "teri_ban_jaungi.mp3",
         "todhi_jagah_marjava.mp3",
         "tu_hain_toh_main_hoon.mp3",
         "tu_hi_yaar_mera.mp3",
-        "tuhi_haqeeqat.mp3",
         "tujhe_kitna_chahne.mp3",
-        "tum_hi_aana.mp3",
-        "tum_jo_aaye.mp3"
+        "tum_hi_aana.mp3"
     ];
     
-    m=o.map(p=>{
+    playlist = songFiles.map(filename => {
         // Extract song title from filename
-        let q=p.replace('.mp3','').replace('_',' ').replace(' (1)','');
+        let title = filename.replace('.mp3', '').replace('_', ' ').replace(' (1)', '');
         
-        q=q.split(' ').map(r=>r.charAt(0).toUpperCase()+r.slice(1).toLowerCase()).join(' ');
+        // Clean up title formatting
+        title = title.split(' ').map(word => 
+            word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+        ).join(' ');
         
-        if(q.includes('Iktara'))q='Iktara - Wake Up Sid';
-        if(q.includes('Mehram'))q='Mehram - Animal 2023';
-        if(q.includes('Sahiba'))q='Sahiba - Aditya R';
-        if(q.includes('Hua Mai'))q='Hua Mai - Finding Her';
+        // Handle special cases
+        if (title.includes('Iktara')) title = 'Iktara - Wake Up Sid';
+        if (title.includes('Mehram')) title = 'Mehram - Animal 2023';
+        if (title.includes('Sahiba')) title = 'Sahiba - Aditya R';
+        if (title.includes('Hua Mai')) title = 'Hua Mai - Finding Her';
         
-        return{title:q,artist:"Bollywood",duration:"4:00",url:`static/songs/${p}`};
+        return {
+            title: title,
+            artist: "Bollywood",
+            duration: "4:00", // Default duration
+            url: `static/songs/${filename}`
+        };
     });
     
-    k(`Generated playlist with ${m.length} songs:`,m.map(s=>s.title));
-    return m;
+    log(`Generated playlist with ${playlist.length} songs:`, playlist.map(s => s.title));
+    return playlist;
 }
 
 // Initialize the application
@@ -78,11 +90,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Initialize the application
 function initializeApp() {
-    c = document.getElementById('c');
-    if (c) {
-        c.volume = 1; // Set initial volume
+    audioPlayer = document.getElementById('audioPlayer');
+    if (audioPlayer) {
+        audioPlayer.volume = 1; // Set initial volume
     }
-    n(); // Generate playlist from available songs
+    generatePlaylist(); // Generate playlist from available songs
     showSection('home');
 }
 
@@ -116,52 +128,89 @@ function setupEventListeners() {
 
     // Memory cards - removed click functionality for details
 
-
     // Add click listener to document for first interaction
     document.addEventListener('click', handleFirstUserInteraction, { once: true });
     document.addEventListener('keydown', handleFirstUserInteraction, { once: true });
     document.addEventListener('touchstart', handleFirstUserInteraction, { once: true });
 
     // Audio player events
-    if (c) {
-        c.addEventListener('ended', nextSong);
-        c.addEventListener('timeupdate', updateProgress);
+    if (audioPlayer) {
+        audioPlayer.addEventListener('ended', nextSong);
+        audioPlayer.addEventListener('timeupdate', updateProgress);
     }
 
     // Keyboard shortcuts
     document.addEventListener('keydown', handleKeyboardShortcuts);
 }
 
-// Show specific section
+// Show specific section with amazing transitions
 function showSection(sectionId) {
+    // Don't transition if already on the same section
+    if (currentSection === sectionId) return;
+    
+    // Show transition overlay
+    showPageTransition();
+    
     // Scroll to top first
     window.scrollTo({ top: 0, behavior: 'smooth' });
     
-    // Hide all sections
-    const sections = document.querySelectorAll('.section');
-    sections.forEach(section => {
-        section.classList.remove('active');
-    });
+    // Add leaving animation to current section
+    const currentActiveSection = document.querySelector('.section.active');
+    if (currentActiveSection) {
+        currentActiveSection.classList.add('leaving');
+    }
+    
+    // Wait for leaving animation to complete
+    setTimeout(() => {
+        // Hide all sections
+        const sections = document.querySelectorAll('.section');
+        sections.forEach(section => {
+            section.classList.remove('active', 'leaving');
+        });
 
-    // Show target section
-    const targetSection = document.getElementById(sectionId);
-    if (targetSection) {
-        targetSection.classList.add('active');
-        d = sectionId;
-        
-        // Add entrance animation
-        targetSection.style.animation = 'slideInUp 0.6s ease';
-        
-        // Special effects for different sections
-        if (sectionId === 'home') {
-            createConfetti();
-        } else if (sectionId === 'memories') {
-            animateMemoryCards();
-        } else if (sectionId === 'wishes') {
-            animateWishCards();
-        } else if (sectionId === 'madeby') {
-            animateMadeBySection();
+        // Show target section
+        const targetSection = document.getElementById(sectionId);
+        if (targetSection) {
+            targetSection.classList.add('active');
+            currentSection = sectionId;
+            
+            // Add entrance animation
+            targetSection.style.animation = 'none';
+            targetSection.offsetHeight; // Trigger reflow
+            targetSection.style.animation = null;
+            
+            // Special effects for different sections
+            if (sectionId === 'home') {
+                createConfetti();
+            } else if (sectionId === 'memories') {
+                animateMemoryCards();
+            } else if (sectionId === 'wishes') {
+                animateWishCards();
+            } else if (sectionId === 'madeby') {
+                animateMadeBySection();
+            }
+            
+            // Hide transition overlay
+            hidePageTransition();
         }
+    }, 150); // Ultra short transition time
+}
+
+// Show page transition overlay
+function showPageTransition() {
+    const overlay = document.getElementById('pageTransitionOverlay');
+    if (overlay) {
+        overlay.classList.add('active');
+    }
+}
+
+// Hide page transition overlay
+function hidePageTransition() {
+    const overlay = document.getElementById('pageTransitionOverlay');
+    if (overlay) {
+        setTimeout(() => {
+            overlay.classList.remove('active');
+        }, 100); // Ultra short hide time
     }
 }
 
@@ -176,125 +225,125 @@ function updateActiveNavLink(activeLink) {
 
 // Music Player Functions
 function togglePlayPause() {
-    if (b) {
+    if (isPlaying) {
         pauseSong();
     } else {
-        playSong(a);
+        playSong(currentSongIndex);
     }
 }
 
 function playSong(index) {
-    if (index >= 0 && index < m.length) {
-        a = index;
-        const song = m[index];
+    if (index >= 0 && index < playlist.length) {
+        currentSongIndex = index;
+        const song = playlist[index];
         
         // Set audio source and play
-        if (c) {
-            c.src = song.url;
+        if (audioPlayer) {
+            audioPlayer.src = song.url;
             
-            if (g) {
+            if (hasUserInteracted) {
                 // User has interacted, we can play audio
-                c.play().then(() => {
-                    b = true;
+                audioPlayer.play().then(() => {
+                    isPlaying = true;
                     updatePlayButton();
                     showMusicNotification();
-                    k('Successfully playing:', song.title);
+                    log('Successfully playing:', song.title);
                     
                     // Set up 20-second timer to advance to next song
                     setTimeout(() => {
-                        if (b) {
+                        if (isPlaying) {
                             nextSong();
                         }
                     }, 20000); // 20 seconds
                     
                 }).catch(error => {
-                    k('Audio play failed:', error);
+                    log('Audio play failed:', error);
                     // Try to play again after a short delay
                     setTimeout(() => {
-                        c.play().then(() => {
-                            b = true;
+                        audioPlayer.play().then(() => {
+                            isPlaying = true;
                             updatePlayButton();
                             showMusicNotification();
                             
                             // Set up 20-second timer to advance to next song
                             setTimeout(() => {
-                                if (b) {
+                                if (isPlaying) {
                                     nextSong();
                                 }
                             }, 20000); // 20 seconds
                             
                         }).catch(err => {
-                            k('Retry failed:', err);
+                            log('Retry failed:', err);
                             showMusicNotification();
                         });
                     }, 500);
                 });
             } else {
                 // Store the song to play after user interaction
-                h = index;
-                k('Music queued for after user interaction:', song.title);
+                pendingSongIndex = index;
+                log('Music queued for after user interaction:', song.title);
             }
         }
     }
 }
 
 function pauseSong() {
-    if (c) {
-        c.pause();
-        b = false;
+    if (audioPlayer) {
+        audioPlayer.pause();
+        isPlaying = false;
         updatePlayButton();
     }
 }
 
 function nextSong() {
-    if (m.length === 0) return;
+    if (playlist.length === 0) return;
     
     // Fade out current song smoothly
-    if (c && b) {
+    if (audioPlayer && isPlaying) {
         const fadeOutInterval = setInterval(() => {
-            if (c.volume > 0.1) {
-                c.volume -= 0.1;
+            if (audioPlayer.volume > 0.1) {
+                audioPlayer.volume -= 0.1;
             } else {
-                c.volume = 0;
+                audioPlayer.volume = 0;
                 clearInterval(fadeOutInterval);
                 
                 // Reset volume for next song
-                c.volume = 1;
+                audioPlayer.volume = 1;
                 
-                // Play next random song with equal probability, avoiding recent repeats
-                const randomIndex = getRandomSongIndex();
+                // Play next random song with equal probability
+                const randomIndex = Math.floor(Math.random() * playlist.length);
                 playSong(randomIndex);
                 
-                k(`Next random song: ${m[randomIndex].title}`);
+                log(`Next random song: ${playlist[randomIndex].title}`);
             }
         }, 50);
     } else {
         // If no audio player or not playing, just advance
-        const randomIndex = getRandomSongIndex();
+        const randomIndex = Math.floor(Math.random() * playlist.length);
         playSong(randomIndex);
         
-        k(`Next random song: ${m[randomIndex].title}`);
+        log(`Next random song: ${playlist[randomIndex].title}`);
     }
 }
 
 function previousSong() {
-    if (m.length === 0) return;
+    if (playlist.length === 0) return;
     
-    // Play previous random song with equal probability, avoiding recent repeats
-    const randomIndex = getRandomSongIndex();
+    // Play previous random song with equal probability
+    const randomIndex = Math.floor(Math.random() * playlist.length);
     playSong(randomIndex);
     
-    k(`Previous random song: ${m[randomIndex].title}`);
+    log(`Previous random song: ${playlist[randomIndex].title}`);
 }
 
 function shufflePlaylist() {
-    if (m.length === 0) return;
+    if (playlist.length === 0) return;
     
     // Select a completely random song with equal probability
-        const randomIndex = Math.floor(Math.random() * m.length);
+    const randomIndex = Math.floor(Math.random() * playlist.length);
     playSong(randomIndex);
     
-    k(`Shuffled to random song: ${m[randomIndex].title}`);
+    log(`Shuffled to random song: ${playlist[randomIndex].title}`);
     
     // Visual feedback
     const shuffleBtn = document.querySelector('.shuffle-btn');
@@ -309,7 +358,7 @@ function shufflePlaylist() {
 function updatePlayButton() {
     const playBtn = document.querySelector('.play-btn i');
     if (playBtn) {
-        playBtn.className = b ? 'fas fa-pause' : 'fas fa-play';
+        playBtn.className = isPlaying ? 'fas fa-pause' : 'fas fa-play';
     }
 }
 
@@ -388,10 +437,10 @@ function startCelebration() {
     createConfetti();
     
     // Play celebration sound (if available)
-    if (c) {
-        c.src = "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav";
-        c.play().catch(() => {
-            console.k('Celebration sound not available');
+    if (audioPlayer) {
+        audioPlayer.src = "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav";
+        audioPlayer.play().catch(() => {
+            console.log('Celebration sound not available');
         });
     }
     
@@ -430,7 +479,7 @@ function showCelebrationMessage() {
 
 // Back button function
 function goBack() {
-    if (d !== 'home') {
+    if (currentSection !== 'home') {
         showSection('home');
         updateActiveNavLink(document.querySelector('.nav-link[href="#home"]'));
     }
@@ -438,23 +487,23 @@ function goBack() {
 
 // Auto-rotation functions
 function startAutoRotate() {
-    f = true;
+    isAutoRotating = true;
     const autoBtn = document.querySelector('.auto-rotate-btn');
     if (autoBtn) {
         autoBtn.classList.add('active');
     }
     
-    e = setInterval(() => {
-        if (d === 'home') {
+    autoRotateInterval = setInterval(() => {
+        if (currentSection === 'home') {
             showSection('memories');
             updateActiveNavLink(document.querySelector('.nav-link[href="#memories"]'));
-        } else if (d === 'memories') {
+        } else if (currentSection === 'memories') {
             showSection('wishes');
             updateActiveNavLink(document.querySelector('.nav-link[href="#wishes"]'));
-        } else if (d === 'wishes') {
+        } else if (currentSection === 'wishes') {
             showSection('madeby');
             updateActiveNavLink(document.querySelector('.nav-link[href="#madeby"]'));
-        } else if (d === 'madeby') {
+        } else if (currentSection === 'madeby') {
             showSection('home');
             updateActiveNavLink(document.querySelector('.nav-link[href="#home"]'));
         }
@@ -462,20 +511,20 @@ function startAutoRotate() {
 }
 
 function stopAutoRotate() {
-    f = false;
+    isAutoRotating = false;
     const autoBtn = document.querySelector('.auto-rotate-btn');
     if (autoBtn) {
         autoBtn.classList.remove('active');
     }
     
-    if (e) {
-        clearInterval(e);
-        e = null;
+    if (autoRotateInterval) {
+        clearInterval(autoRotateInterval);
+        autoRotateInterval = null;
     }
 }
 
 function toggleAutoRotate() {
-    if (f) {
+    if (isAutoRotating) {
         stopAutoRotate();
     } else {
         startAutoRotate();
@@ -520,22 +569,22 @@ function handleKeyboardShortcuts(e) {
     switch(e.key) {
         case ' ':
             e.preventDefault();
-            if (d === 'music') {
+            if (currentSection === 'music') {
                 togglePlayPause();
             }
             break;
         case 'ArrowRight':
-            if (d === 'music') {
+            if (currentSection === 'music') {
                 nextSong();
             }
             break;
         case 'ArrowLeft':
-            if (d === 'music') {
+            if (currentSection === 'music') {
                 previousSong();
             }
             break;
         case 's':
-            if (d === 'music') {
+            if (currentSection === 'music') {
                 shufflePlaylist();
             }
             break;
@@ -544,9 +593,9 @@ function handleKeyboardShortcuts(e) {
 
 // Handle first user interaction to start music
 function handleFirstUserInteraction() {
-    if (!g) {
-        g = true;
-        k('User interaction detected - starting music');
+    if (!hasUserInteracted) {
+        hasUserInteracted = true;
+        log('User interaction detected - starting music');
         
         // Remove the birthday prompt with animation
         const prompt = document.querySelector('.birthday-prompt');
@@ -575,25 +624,25 @@ function handleFirstUserInteraction() {
 // Auto-play random music with equal probability
 function startRandomMusic() {
     if (playlist.length === 0) {
-        k('No songs available in playlist');
+        log('No songs available in playlist');
         return;
     }
     
     // Select a random song with equal probability
-        const randomIndex = Math.floor(Math.random() * m.length);
-    a = randomIndex;
+    const randomIndex = Math.floor(Math.random() * playlist.length);
+    currentSongIndex = randomIndex;
     
-    k(`Playing random song ${a + 1}/${m.length}: ${m[a].title}`);
+    log(`Playing random song ${currentSongIndex + 1}/${playlist.length}: ${playlist[currentSongIndex].title}`);
     
     // Start playing
-    playSong(a);
+    playSong(currentSongIndex);
     
     // Show a subtle notification
     showMusicNotification();
     
     // Set up auto-advance to next song
-    if (c) {
-        c.addEventListener('ended', () => {
+    if (audioPlayer) {
+        audioPlayer.addEventListener('ended', () => {
             nextSong();
         });
     }
@@ -669,7 +718,7 @@ function showMusicPrompt() {
     
     // Auto-remove after 8 seconds if no interaction
     setTimeout(() => {
-        if (prompt.parentNode && !g) {
+        if (prompt.parentNode && !hasUserInteracted) {
             prompt.style.animation = 'fadeOut 0.5s ease';
             setTimeout(() => {
                 if (prompt.parentNode) {
@@ -682,7 +731,7 @@ function showMusicPrompt() {
 
 function showMusicNotification() {
     const notification = document.createElement('div');
-    notification.innerHTML = '🎵 Now Playing: ' + m[a].title + '<br><small>by ' + m[a].artist + '</small>';
+    notification.innerHTML = '🎵 ' + playlist[currentSongIndex].title;
     notification.style.cssText = `
         position: fixed;
         top: 100px;
