@@ -164,6 +164,8 @@ function showSection(sectionId) {
             animateMemoryCards();
         } else if (sectionId === 'wishes') {
             animateWishCards();
+        } else if (sectionId === 'madeby') {
+            animateMadeBySection();
         }
     }
 }
@@ -455,6 +457,9 @@ function startAutoRotate() {
             showSection('wishes');
             updateActiveNavLink(document.querySelector('.nav-link[href="#wishes"]'));
         } else if (currentSection === 'wishes') {
+            showSection('madeby');
+            updateActiveNavLink(document.querySelector('.nav-link[href="#madeby"]'));
+        } else if (currentSection === 'madeby') {
             showSection('home');
             updateActiveNavLink(document.querySelector('.nav-link[href="#home"]'));
         }
@@ -494,6 +499,24 @@ function animateWishCards() {
     const wishCards = document.querySelectorAll('.wish-card');
     wishCards.forEach((card, index) => {
         card.style.animation = `slideInUp 0.6s ease ${index * 0.2}s both`;
+    });
+}
+
+function animateMadeBySection() {
+    const madeByCard = document.querySelector('.made-by-card');
+    const loveItems = document.querySelectorAll('.love-item');
+    const floatingHearts = document.querySelectorAll('.floating-hearts-small i');
+    
+    if (madeByCard) {
+        madeByCard.style.animation = 'slideInUp 0.8s ease';
+    }
+    
+    loveItems.forEach((item, index) => {
+        item.style.animation = `slideInLeft 0.6s ease ${index * 0.2}s both`;
+    });
+    
+    floatingHearts.forEach((heart, index) => {
+        heart.style.animation = `float 3s ease-in-out infinite ${index * 0.6}s`;
     });
 }
 
