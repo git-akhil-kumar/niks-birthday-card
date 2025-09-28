@@ -25,9 +25,11 @@ let playlist = [];
 function generatePlaylist() {
     // List of all MP3 files in static/songs folder
     const songFiles = [
+        "aafreen_aafreen_unplug.mp3",
         "apna_bana_le.mp3",
         "atif_aslam_new.mp3",
         "dil_diyan_gallan.mp3",
+        "dil_tu_jaan.mp3",
         "falak_tak.mp3",
         "gerua_reverb.mp3",
         "hua_mai_x_finding_her.mp3",
@@ -38,6 +40,7 @@ function generatePlaylist() {
         "kon_tujhe_peyar_kare.mp3",
         "lut_gaya.mp3",
         "main_shaas_bhi_lu.mp3",
+        "malang_sajna.mp3",
         "mehram_animal_2023.mp3",
         "paniyon_sa.mp3",
         "sahiba_aditya_r.mp3",
