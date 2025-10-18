@@ -4,13 +4,14 @@ A beautiful, responsive birthday card website with Bollywood music, animations, 
 
 ## Features
 
-- 🎵 Auto-playing Bollywood music playlist (10-second previews)
+- 🎵 **Auto-discovering Bollywood music playlist** (no code changes needed!)
 - 🎁 Interactive birthday card prompt
 - 📸 Photo gallery with memories
 - 🎨 Smooth animations and transitions
 - 📱 Fully responsive design
 - 🔄 Auto-rotation between sections
 - 🎯 Production-ready (no console logs in production)
+- ✈️ **Trip timeline** with expandable future adventures
 
 ## File Structure
 
@@ -49,10 +50,30 @@ A beautiful, responsive birthday card website with Bollywood music, animations, 
 
 ## Customization
 
-- **Songs**: Add MP3 files to `static/songs/` (auto-discovered)
+- **Songs**: Simply add MP3 files to `static/songs/` - they're automatically discovered!
 - **Photos**: Update image paths in `index.html`
 - **Text**: Modify content in `index.html`
 - **Styling**: Edit `styles.css`
+- **Trips**: Use the "Add New Trip" button in the Trip section
+
+## 🎵 Automated Song Discovery
+
+The website now automatically discovers all MP3 files in the `static/songs/` folder! No more manual code updates needed.
+
+### How it works:
+1. **Primary method**: Uses `get-songs.php` to scan the songs directory
+2. **Fallback method**: Uses a comprehensive hardcoded list if PHP isn't available
+3. **Smart formatting**: Automatically formats song titles from filenames
+4. **Special cases**: Handles complex song names with custom formatting
+
+### Adding new songs:
+1. Simply drop MP3 files into `static/songs/`
+2. Refresh the website
+3. Songs are automatically included in the playlist!
+
+### Testing:
+- Visit `song-test.html` to see the song discovery in action
+- Check browser console for discovery logs (in local development)
 
 ## Browser Support
 

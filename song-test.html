@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Song Discovery Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .song-item { padding: 10px; border-bottom: 1px solid #eee; }
+        .song-title { font-weight: bold; color: #333; }
+        .song-url { color: #666; font-size: 0.9em; }
+        .test-results { background: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0; }
+        .success { color: green; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+    <h1>🎵 Automated Song Discovery Test</h1>
+    <p>Testing if newly added songs are properly discovered and can be played.</p>
+    
+    <div class="test-results">
+        <h3>Test Results:</h3>
+        <div id="test-status">Loading...</div>
+    </div>
+    
+    <h3>Discovered Songs:</h3>
+    <div id="playlist-output"></div>
+
+    <script>
+        let playlist = [];
+        let isLoadingSongs = false;
+
+        async function generatePlaylist() {
+            if (isLoadingSongs) return playlist;
+            isLoadingSongs = true;
+
+            try {
+                const response = await fetch('get-songs.php');
+                if (response.ok) {
+                    const songFiles = await response.json();
+                    console.log('Successfully loaded songs from PHP:', songFiles);
+                    playlist = createPlaylistFromFiles(songFiles);
+                    document.getElementById('test-status').innerHTML = 
+                        '<span class="success">✅ PHP script working - ' + songFiles.length + ' songs discovered</span>';
+                } else {
+                    throw new Error('PHP script not available');
+                }
+            } catch (error) {
+                console.log('PHP script not available, using fallback method:', error);
+                playlist = await discoverSongsFallback();
+                document.getElementById('test-status').innerHTML = 
+                    '<span class="error">⚠️ Using fallback method - ' + playlist.length + ' songs loaded</span>';
+            }
+
+            isLoadingSongs = false;
+            console.log(`Generated playlist with ${playlist.length} songs:`, playlist.map((s) => s.title));
+            
+            const playlistOutput = document.getElementById('playlist-output');
+            playlist.forEach((song, index) => {
+                const div = document.createElement('div');
+                div.className = 'song-item';
+                div.innerHTML = `
+                    <div class="song-title">${index + 1}. ${song.title}</div>
+                    <div class="song-url">${song.url}</div>
+                `;
+                playlistOutput.appendChild(div);
+            });
+
+            // Test specific songs
+            const testSongs = ['Old Town Girl', 'Ek Din Teri Raho Me'];
+            const foundSongs = testSongs.filter(song => 
+                playlist.some(p => p.title.toLowerCase().includes(song.toLowerCase()))
+            );
+            
+            const testDiv = document.createElement('div');
+            testDiv.className = 'test-results';
+            testDiv.innerHTML = `
+                <h3>New Song Test:</h3>
+                <p><strong>Looking for:</strong> ${testSongs.join(', ')}</p>
+                <p><strong>Found:</strong> ${foundSongs.join(', ') || 'None'}</p>
+                <p><strong>Status:</strong> ${foundSongs.length === testSongs.length ? 
+                    '<span class="success">✅ All new songs found!</span>' : 
+                    '<span class="error">❌ Some songs missing</span>'}</p>
+                <p><strong>Note:</strong> Saiyaara was removed from the playlist</p>
+            `;
+            document.body.appendChild(testDiv);
+
+            return playlist;
+        }
+
+        async function discoverSongsFallback() {
+            const knownSongs = [
+                "aafreen_aafreen_unplug.mp3", "akhiyan_gulab2.mp3", "apna_bana_le.mp3", "atif_aslam_new.mp3",
+                "dil_diyan_gallan.mp3", "dil_tu_jaan.mp3", "ek_din_teri_raho_me.mp3", "falak_tak.mp3",
+                "gerua_reverb.mp3", "girl_i_need_you.mp3", "ha_ham_badalna_laga.mp3", "hua_mai_x_finding_her.mp3",
+                "Iktara Wake Up Sid 128 Kbps.mp3", "ishq_bulaava_bollywood.mp3", "jab_jab_tere_pass.mp3",
+                "jana_samjho_na.mp3", "khairiyat_puchho.mp3", "kon_tujhe_peyar_kare.mp3", "lut_gaya.mp3",
+                "main_shaas_bhi_lu.mp3", "malang_sajna.mp3", "man_mera.mp3", "mehram_animal_2023.mp3",
+                "old-town-girl.mp3", "paniyon_sa.mp3", "ride_it_hindi.mp3", "sahiba_aditya_r.mp3",
+                "saiyaara.mp3", "tera_ban_jaunga.mp3", "tere_hawaale_arijit.mp3", "teri_ban_jaungi.mp3",
+                "todhi_jagah_marjava.mp3", "tu_hain_toh_main_hoon.mp3", "tu_hi_yaar_mera.mp3",
+                "tuhi_haqeeqat.mp3", "tujhe_kitna_chahne.mp3", "tum_hi_aana.mp3", "tum_jo_aaye.mp3",
+            ];
+            return createPlaylistFromFiles(knownSongs);
+        }
+
+        function createPlaylistFromFiles(songFiles) {
+            return songFiles.map((filename) => {
+                let title = filename.replace(".mp3", "").replace(/_/g, " ").replace(" (1)", "");
+                title = title.split(" ").map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(" ");
+                if (title.includes("Iktara")) title = "Iktara - Wake Up Sid";
+                if (title.includes("Mehram")) title = "Mehram - Animal 2023";
+                if (title.includes("Sahiba")) title = "Sahiba - Aditya R";
+                if (title.includes("Hua Mai")) title = "Hua Mai - Finding Her";
+                if (title.includes("Old Town Girl")) title = "Old Town Girl";
+                if (title.includes("Girl I Need You")) title = "Girl I Need You";
+                if (title.includes("Ride It Hindi")) title = "Ride It - Hindi Version";
+                if (title.includes("Tuhi Haqeeqat")) title = "Tuhi Haqeeqat";
+                if (title.includes("Teri Ban Jaungi")) title = "Teri Ban Jaungi";
+                if (title.includes("Ek Din Teri Raho Me")) title = "Ek Din Teri Raho Me";
+                return {
+                    title: title,
+                    artist: "Bollywood",
+                    duration: "4:00",
+                    url: `static/songs/${filename}`,
+                };
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", generatePlaylist);
+    </script>
+</body>
+</html>

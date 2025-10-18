@@ -23,20 +23,109 @@ function log(...args) {
 
 // Dynamic Songs Playlist - Auto-discovered from static/songs folder
 let playlist = [];
+let isLoadingSongs = false;
+
+// Special feature: Start with Saiyaara for one day
+let SPECIAL_DAY_MODE = true; // Set to false to return to normal behavior
+
+// Function to handle special day mode - starts with Saiyaara
+function handleSpecialDayMode(playlist) {
+	if (!SPECIAL_DAY_MODE) {
+		log('🎵 Special Day Mode: DISABLED');
+		return playlist;
+	}
+	
+	log('🎵 Special Day Mode: ENABLED - Processing playlist...');
+	log('🎵 Playlist before special mode:', playlist.map(s => s.title).slice(0, 5));
+	
+	// Find Saiyaara in the playlist
+	const saiyaaraIndex = playlist.findIndex(song => 
+		song.title.toLowerCase().includes('saiyaara')
+	);
+	
+	log('🎵 Saiyaara found at index:', saiyaaraIndex);
+	
+	if (saiyaaraIndex !== -1) {
+		// Move Saiyaara to the beginning
+		const saiyaaraSong = playlist.splice(saiyaaraIndex, 1)[0];
+		playlist.unshift(saiyaaraSong);
+		log('🎵 Special Day Mode: Starting with Saiyaara!');
+		log('🎵 Playlist after special mode:', playlist.map(s => s.title).slice(0, 5));
+	} else {
+		log('🎵 WARNING: Saiyaara not found in playlist - disabling special day mode');
+		log('🎵 Available songs:', playlist.map(s => s.title).slice(0, 5));
+		SPECIAL_DAY_MODE = false; // Disable special mode if Saiyaara is not available
+	}
+	
+	return playlist;
+}
 
 // Function to generate playlist from available MP3 files
-function generatePlaylist() {
-	// List of all MP3 files in static/songs folder
-	const songFiles = [
+async function generatePlaylist() {
+	if (isLoadingSongs) return playlist;
+	
+	isLoadingSongs = true;
+	
+	try {
+		// Try to fetch songs list from PHP script first
+		const response = await fetch('get-songs.php');
+		if (response.ok) {
+			const songFiles = await response.json();
+			log('Successfully loaded songs from PHP:', songFiles);
+			playlist = createPlaylistFromFiles(songFiles);
+		} else {
+			throw new Error('PHP script not available');
+		}
+	} catch (error) {
+		log('PHP script not available, using fallback method:', error);
+		// Fallback: try to discover songs by attempting to load them
+		playlist = await discoverSongsFallback();
+	}
+	
+	isLoadingSongs = false;
+	
+		// Apply special day mode if enabled
+		playlist = handleSpecialDayMode(playlist);
+		
+		log(
+			`Generated playlist with ${playlist.length} songs:`,
+			playlist.map((s) => s.title)
+		);
+		return playlist;
+}
+
+// Function to toggle special day mode (for easy switching)
+function toggleSpecialDayMode() {
+	SPECIAL_DAY_MODE = !SPECIAL_DAY_MODE;
+	log(`🎵 Special Day Mode: ${SPECIAL_DAY_MODE ? 'ENABLED' : 'DISABLED'}`);
+	
+	// Regenerate playlist with new mode
+	if (playlist.length > 0) {
+		generatePlaylist().then(() => {
+			// Restart with first song
+			currentSongIndex = 0;
+			playSong(currentSongIndex);
+		});
+	}
+}
+
+// Fallback method to discover songs
+async function discoverSongsFallback() {
+	const knownSongs = [
 		"aafreen_aafreen_unplug.mp3",
+		"akhiyan_gulab2.mp3",
 		"apna_bana_le.mp3",
 		"atif_aslam_new.mp3",
 		"dil_diyan_gallan.mp3",
 		"dil_tu_jaan.mp3",
+		"ek_din_teri_raho_me.mp3",
 		"falak_tak.mp3",
 		"gerua_reverb.mp3",
+		"girl_i_need_you.mp3",
+		"ha_ham_badalna_laga.mp3",
 		"hua_mai_x_finding_her.mp3",
 		"Iktara Wake Up Sid 128 Kbps.mp3",
+		"ishq_bulaava_bollywood.mp3",
 		"jab_jab_tere_pass.mp3",
 		"jana_samjho_na.mp3",
 		"khairiyat_puchho.mp3",
@@ -44,20 +133,30 @@ function generatePlaylist() {
 		"lut_gaya.mp3",
 		"main_shaas_bhi_lu.mp3",
 		"malang_sajna.mp3",
+		"man_mera.mp3",
 		"mehram_animal_2023.mp3",
+		"old-town-girl.mp3",
 		"paniyon_sa.mp3",
+		"ride_it_hindi.mp3",
 		"sahiba_aditya_r.mp3",
-		"saiyaara.mp3",
 		"tera_ban_jaunga.mp3",
 		"tere_hawaale_arijit.mp3",
+		"teri_ban_jaungi.mp3",
 		"todhi_jagah_marjava.mp3",
 		"tu_hain_toh_main_hoon.mp3",
 		"tu_hi_yaar_mera.mp3",
+		"tuhi_haqeeqat.mp3",
 		"tujhe_kitna_chahne.mp3",
 		"tum_hi_aana.mp3",
+		"tum_jo_aaye.mp3",
 	];
+	
+	return createPlaylistFromFiles(knownSongs);
+}
 
-	playlist = songFiles.map((filename) => {
+// Helper function to create playlist from file list
+function createPlaylistFromFiles(songFiles) {
+	return songFiles.map((filename) => {
 		// Extract song title from filename
 		let title = filename.replace(".mp3", "").replace("_", " ").replace(" (1)", "");
 
@@ -72,6 +171,12 @@ function generatePlaylist() {
 		if (title.includes("Mehram")) title = "Mehram - Animal 2023";
 		if (title.includes("Sahiba")) title = "Sahiba - Aditya R";
 		if (title.includes("Hua Mai")) title = "Hua Mai - Finding Her";
+		if (title.includes("Old Town Girl")) title = "Old Town Girl";
+		if (title.includes("Girl I Need You")) title = "Girl I Need You";
+		if (title.includes("Ride It Hindi")) title = "Ride It - Hindi Version";
+		if (title.includes("Tuhi Haqeeqat")) title = "Tuhi Haqeeqat";
+		if (title.includes("Teri Ban Jaungi")) title = "Teri Ban Jaungi";
+		if (title.includes("Ek Din Teri Raho Me")) title = "Ek Din Teri Raho Me";
 
 		return {
 			title: title,
@@ -80,17 +185,11 @@ function generatePlaylist() {
 			url: `static/songs/${filename}`,
 		};
 	});
-
-	log(
-		`Generated playlist with ${playlist.length} songs:`,
-		playlist.map((s) => s.title)
-	);
-	return playlist;
 }
 
 // Initialize the application
-document.addEventListener("DOMContentLoaded", function () {
-	initializeApp();
+document.addEventListener("DOMContentLoaded", async function () {
+	await initializeApp();
 	setupEventListeners();
 	createFloatingElements();
 	startAutoRotate();
@@ -99,12 +198,12 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 // Initialize the application
-function initializeApp() {
+async function initializeApp() {
 	audioPlayer = document.getElementById("audioPlayer");
 	if (audioPlayer) {
 		audioPlayer.volume = 1; // Set initial volume
 	}
-	generatePlaylist(); // Generate playlist from available songs
+	await generatePlaylist(); // Generate playlist from available songs
 	preloadAudio(); // Preload audio files
 	showSection("home");
 }
@@ -201,6 +300,8 @@ function showSection(sectionId) {
 				createConfetti();
 			} else if (sectionId === "memories") {
 				animateMemoryCards();
+			} else if (sectionId === "trip") {
+				animateTimelineItems();
 			} else if (sectionId === "wishes") {
 				animateWishCards();
 			} else if (sectionId === "madeby") {
@@ -495,6 +596,9 @@ function startAutoRotate() {
 			showSection("memories");
 			updateActiveNavLink(document.querySelector('.nav-link[href="#memories"]'));
 		} else if (currentSection === "memories") {
+			showSection("trip");
+			updateActiveNavLink(document.querySelector('.nav-link[href="#trip"]'));
+		} else if (currentSection === "trip") {
 			showSection("wishes");
 			updateActiveNavLink(document.querySelector('.nav-link[href="#wishes"]'));
 		} else if (currentSection === "wishes") {
@@ -543,6 +647,13 @@ function animateWishCards() {
 	});
 }
 
+function animateTimelineItems() {
+	const timelineItems = document.querySelectorAll(".timeline-item");
+	timelineItems.forEach((item, index) => {
+		item.style.animation = `slideInUp 0.6s ease ${index * 0.1}s both`;
+	});
+}
+
 function animateMadeBySection() {
 	const madeByCard = document.querySelector(".made-by-card");
 	const loveItems = document.querySelectorAll(".love-item");
@@ -585,6 +696,9 @@ function handleKeyboardShortcuts(e) {
 				shufflePlaylist();
 			}
 			break;
+		case "m":
+			toggleSpecialDayMode();
+			break;
 	}
 }
 
@@ -625,12 +739,21 @@ function startRandomMusic() {
 		return;
 	}
 
-	// Select a random song with equal probability
-	const randomIndex = Math.floor(Math.random() * playlist.length);
-	currentSongIndex = randomIndex;
+	// In special day mode, start with the first song (Saiyaara)
+	// Otherwise, select a random song
+	let songIndex;
+	if (SPECIAL_DAY_MODE) {
+		songIndex = 0; // Start with first song (Saiyaara)
+		log("🎵 Special Day Mode: Starting with first song (Saiyaara)");
+	} else {
+		songIndex = Math.floor(Math.random() * playlist.length);
+		log("🎵 Normal Mode: Playing random song");
+	}
+	
+	currentSongIndex = songIndex;
 
 	log(
-		`Playing random song ${currentSongIndex + 1}/${playlist.length}: ${
+		`Playing song ${currentSongIndex + 1}/${playlist.length}: ${
 			playlist[currentSongIndex].title
 		}`
 	);
@@ -808,6 +931,293 @@ function createRippleEffect(e) {
 			ripple.parentNode.removeChild(ripple);
 		}
 	}, 600);
+}
+
+// Trip functionality
+function showAddTripModal() {
+	const modal = document.createElement("div");
+	modal.className = "trip-modal";
+	modal.innerHTML = `
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add New Trip</h3>
+                <button class="close-btn" onclick="closeTripModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Date</label>
+                    <input type="date" id="tripDate" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label>Trip Title</label>
+                    <input type="text" id="tripTitle" class="form-input" placeholder="e.g., Beach Paradise">
+                </div>
+                <div class="form-group">
+                    <label>Location</label>
+                    <input type="text" id="tripLocation" class="form-input" placeholder="e.g., Maldives">
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="tripDescription" class="form-textarea" placeholder="Tell us about this amazing trip..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Trip Type</label>
+                    <select id="tripType" class="form-select">
+                        <option value="plane">✈️ Flight Trip</option>
+                        <option value="car">🚗 Road Trip</option>
+                        <option value="train">🚂 Train Journey</option>
+                        <option value="ship">🚢 Cruise</option>
+                        <option value="mountain">🏔️ Mountain Trek</option>
+                        <option value="beach">🏖️ Beach Holiday</option>
+                        <option value="city">🏙️ City Break</option>
+                        <option value="heart">💕 Romantic Getaway</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeTripModal()">Cancel</button>
+                <button class="btn-add" onclick="addNewTrip()">Add Trip</button>
+            </div>
+        </div>
+    `;
+
+	modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 10000;
+        animation: fadeIn 0.3s ease;
+    `;
+
+	const modalContent = modal.querySelector(".modal-content");
+	modalContent.style.cssText = `
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border-radius: 20px;
+        padding: 0;
+        max-width: 500px;
+        width: 90%;
+        max-height: 80vh;
+        overflow-y: auto;
+        animation: slideInUp 0.3s ease;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    `;
+
+	document.body.appendChild(modal);
+
+	// Add form styles
+	const formStyle = document.createElement("style");
+	formStyle.textContent = `
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-header h3 {
+            color: white;
+            margin: 0;
+            font-size: 1.5rem;
+        }
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .modal-body {
+            padding: 1.5rem;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-group label {
+            display: block;
+            color: white;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        .form-input, .form-textarea, .form-select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+            backdrop-filter: blur(10px);
+        }
+        .form-input::placeholder, .form-textarea::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        .form-textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        .modal-footer {
+            padding: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+        .btn-cancel, .btn-add {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn-cancel {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+        .btn-cancel:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        .btn-add {
+            background: #ff6b6b;
+            color: white;
+        }
+        .btn-add:hover {
+            background: #ff5252;
+            transform: translateY(-2px);
+        }
+    `;
+	document.head.appendChild(formStyle);
+}
+
+function closeTripModal() {
+	const modal = document.querySelector(".trip-modal");
+	if (modal) {
+		modal.style.animation = "fadeOut 0.3s ease";
+		setTimeout(() => {
+			if (modal.parentNode) {
+				modal.parentNode.removeChild(modal);
+			}
+		}, 300);
+	}
+}
+
+function addNewTrip() {
+	const date = document.getElementById("tripDate").value;
+	const title = document.getElementById("tripTitle").value;
+	const location = document.getElementById("tripLocation").value;
+	const description = document.getElementById("tripDescription").value;
+	const type = document.getElementById("tripType").value;
+
+	if (!date || !title || !location || !description) {
+		alert("Please fill in all fields!");
+		return;
+	}
+
+	// Create new timeline item
+	const timeline = document.querySelector(".timeline");
+	const newTripItem = document.createElement("div");
+	newTripItem.className = "timeline-item future";
+	newTripItem.setAttribute("data-date", date);
+
+	// Get icon based on type
+	const iconMap = {
+		plane: "fas fa-plane",
+		car: "fas fa-car",
+		train: "fas fa-train",
+		ship: "fas fa-ship",
+		mountain: "fas fa-mountain",
+		beach: "fas fa-umbrella-beach",
+		city: "fas fa-city",
+		heart: "fas fa-heart"
+	};
+
+	const iconClass = iconMap[type] || "fas fa-heart";
+
+	newTripItem.innerHTML = `
+        <div class="timeline-marker">
+            <i class="${iconClass}"></i>
+        </div>
+        <div class="timeline-content">
+            <div class="timeline-date">${formatDate(date)}</div>
+            <h3 class="timeline-title">${title}</h3>
+            <div class="timeline-location">
+                <i class="fas fa-map-marker-alt"></i>
+                <span>${location}</span>
+            </div>
+            <p class="timeline-description">${description}</p>
+            <div class="timeline-photos">
+                <div class="photo-placeholder future">
+                    <i class="fas fa-calendar-plus"></i>
+                    <span>Planning in progress...</span>
+                </div>
+            </div>
+        </div>
+    `;
+
+	// Insert at the end of timeline
+	timeline.insertBefore(newTripItem, timeline.querySelector(".timeline-footer"));
+
+	// Animate the new item
+	newTripItem.style.animation = "slideInUp 0.6s ease";
+	newTripItem.scrollIntoView({ behavior: "smooth", block: "center" });
+
+	// Close modal
+	closeTripModal();
+
+	// Show success message
+	showTripAddedNotification(title);
+}
+
+function formatDate(dateString) {
+	const date = new Date(dateString);
+	const options = { year: 'numeric', month: 'long', day: 'numeric' };
+	return date.toLocaleDateString('en-US', options);
+}
+
+function showTripAddedNotification(tripTitle) {
+	const notification = document.createElement("div");
+	notification.innerHTML = `🎉 Added "${tripTitle}" to our timeline!`;
+	notification.style.cssText = `
+        position: fixed;
+        top: 100px;
+        right: 20px;
+        background: rgba(0,0,0,0.9);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 25px;
+        z-index: 9999;
+        font-size: 0.9rem;
+        animation: slideInRight 0.5s ease;
+        text-align: center;
+        max-width: 300px;
+    `;
+
+	document.body.appendChild(notification);
+
+	setTimeout(() => {
+		if (notification.parentNode) {
+			notification.style.animation = "slideOutRight 0.5s ease";
+			setTimeout(() => {
+				if (notification.parentNode) {
+					notification.parentNode.removeChild(notification);
+				}
+			}, 500);
+		}
+	}, 3000);
 }
 
 // Add ripple animation to CSS
