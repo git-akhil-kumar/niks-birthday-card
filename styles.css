@@ -1243,7 +1243,37 @@ main {
 }
 
 .trip-image-container:hover .trip-image-overlay {
-    background: linear-gradient(to top, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.3));
+	background: linear-gradient(to top, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.3));
+}
+
+/* Special styling for completed trips (like Goa) */
+.timeline-item:not(.future) .trip-image-container {
+	border: 2px solid rgba(76, 175, 80, 0.3);
+	box-shadow: 0 0 20px rgba(76, 175, 80, 0.2);
+}
+
+.timeline-item:not(.future) .trip-image-overlay {
+	background: linear-gradient(to top, rgba(76, 175, 80, 0.8), transparent);
+}
+
+.timeline-item:not(.future) .trip-image-overlay i {
+	color: #4caf50;
+}
+
+/* Responsive adjustments for trip images */
+@media (max-width: 768px) {
+	.trip-image-container {
+		height: 150px;
+	}
+	
+	.trip-image-overlay {
+		padding: 1rem 0.8rem 0.8rem;
+		font-size: 0.9rem;
+	}
+	
+	.trip-image-overlay i {
+		font-size: 1rem;
+	}
 }
 
 .photo-placeholder {
