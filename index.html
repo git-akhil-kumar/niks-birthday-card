@@ -30,6 +30,7 @@
                 <li><a href="#memories" class="nav-link">Memories</a></li>
                 <li><a href="#trip" class="nav-link">Trip</a></li>
                 <li><a href="#wishes" class="nav-link">Wishes</a></li>
+                <li><a href="#games" class="nav-link">Games</a></li>
                 <li><a href="#madeby" class="nav-link">Made by</a></li>
                 <li><button class="back-btn" onclick="goBack()">
                     <i class="fas fa-arrow-left"></i>
@@ -397,6 +398,61 @@
             </div>
         </section>
 
+        <!-- Games Section -->
+        <section id="games" class="section">
+            <div class="games-container">
+                <h2 class="section-title">Fun Games 🎮</h2>
+                <p class="section-subtitle">Let's have some fun together! Choose a game to play</p>
+                
+                <div class="games-grid">
+                    <div class="game-card" data-game="snake" onclick="openGame('snake')">
+                        <div class="game-icon">
+                            <i class="fas fa-gamepad"></i>
+                        </div>
+                        <div class="game-content">
+                            <h3>Snake Game</h3>
+                            <p>Classic snake game with smooth controls</p>
+                            <div class="game-stats">
+                                <span class="stat">
+                                    <i class="fas fa-star"></i>
+                                    Classic
+                                </span>
+                                <span class="stat">
+                                    <i class="fas fa-mobile-alt"></i>
+                                    Mobile Ready
+                                </span>
+                            </div>
+                        </div>
+                        <div class="play-button">
+                            <i class="fas fa-play"></i>
+                        </div>
+                    </div>
+
+                    <div class="game-card coming-soon" data-game="coming-soon">
+                        <div class="game-icon">
+                            <i class="fas fa-puzzle-piece"></i>
+                        </div>
+                        <div class="game-content">
+                            <h3>More Games</h3>
+                            <p>Coming soon! More exciting games</p>
+                            <div class="game-stats">
+                                <span class="stat">
+                                    <i class="fas fa-clock"></i>
+                                    Coming Soon
+                                </span>
+                            </div>
+                        </div>
+                        <div class="play-button disabled">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="games-footer">
+                </div>
+            </div>
+        </section>
+
         <!-- Made by Section -->
         <section id="madeby" class="section">
             <div class="container">
@@ -462,6 +518,43 @@
     <audio id="audioPlayer" preload="metadata">
         <source src="" type="audio/mpeg">
     </audio>
+
+    <!-- Snake Game Modal -->
+    <div id="snakeGameModal" class="game-modal">
+        <div class="game-modal-content">
+            <div class="game-header">
+                <h3>Snake Game 🐍</h3>
+                <div class="game-controls">
+                    <div class="score-display">
+                        <span>Score: <span id="snakeScore">0</span></span>
+                    </div>
+                    <button class="game-btn" onclick="pauseSnakeGame()" id="pauseBtn">
+                        <i class="fas fa-pause"></i>
+                    </button>
+                    <button class="game-btn" onclick="restartSnakeGame()">
+                        <i class="fas fa-redo"></i>
+                    </button>
+                    <button class="game-btn close-game" onclick="closeSnakeGame()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="game-area">
+                <canvas id="snakeCanvas" width="400" height="400"></canvas>
+                <div class="game-overlay" id="gameOverlay">
+                    <div class="overlay-content">
+                        <h2 id="overlayTitle">Ready to Play?</h2>
+                        <p id="overlayMessage">Use arrow keys or swipe to control the snake</p>
+                        <button class="start-btn" onclick="startSnakeGame()" id="startBtn">
+                            <i class="fas fa-play"></i>
+                            Start Game
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Scripts -->
     <script src="script.js"></script>
