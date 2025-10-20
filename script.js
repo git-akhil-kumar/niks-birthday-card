@@ -10,22 +10,22 @@ let pendingSongIndex = null;
 
 // Snake Game Variables
 let snakeGame = {
-    canvas: null,
-    ctx: null,
-    snake: [{ x: 200, y: 200 }],
-    direction: { x: 0, y: 0 },
-    food: { x: 0, y: 0 },
-    score: 0,
-    gameRunning: false,
-    gameLoop: null,
-    gridSize: 20,
-    canvasSize: 400,
-    touchStartX: 0,
-    touchStartY: 0,
-    gameSpeed: 150, // Initial speed in milliseconds
-    baseSpeed: 150, // Base speed for calculations
-    speedIncrease: 10, // Speed increase per stage
-    stage: 1
+	canvas: null,
+	ctx: null,
+	snake: [{ x: 200, y: 200 }],
+	direction: { x: 0, y: 0 },
+	food: { x: 0, y: 0 },
+	score: 0,
+	gameRunning: false,
+	gameLoop: null,
+	gridSize: 20,
+	canvasSize: 400,
+	touchStartX: 0,
+	touchStartY: 0,
+	gameSpeed: 150, // Initial speed in milliseconds
+	baseSpeed: 150, // Base speed for calculations
+	speedIncrease: 10, // Speed increase per stage
+	stage: 1,
 };
 
 // Environment detection
@@ -51,74 +51,72 @@ let SPECIAL_DAY_MODE = true; // Set to false to return to normal behavior
 // Function to handle special day mode - starts with Saiyaara
 function handleSpecialDayMode(playlist) {
 	if (!SPECIAL_DAY_MODE) {
-		log('🎵 Special Day Mode: DISABLED');
+		log("🎵 Special Day Mode: DISABLED");
 		return playlist;
 	}
-	
-	log('🎵 Special Day Mode: ENABLED - Processing playlist...');
-	log('🎵 Playlist before special mode:', playlist.map(s => s.title).slice(0, 5));
-	
+
+	log("🎵 Special Day Mode: ENABLED - Processing playlist...");
+	log("🎵 Playlist before special mode:", playlist.map((s) => s.title).slice(0, 5));
+
 	// Find Saiyaara in the playlist
-	const saiyaaraIndex = playlist.findIndex(song => 
-		song.title.toLowerCase().includes('saiyaara')
-	);
-	
-	log('🎵 Saiyaara found at index:', saiyaaraIndex);
-	
+	const saiyaaraIndex = playlist.findIndex((song) => song.title.toLowerCase().includes("saiyaara"));
+
+	log("🎵 Saiyaara found at index:", saiyaaraIndex);
+
 	if (saiyaaraIndex !== -1) {
 		// Move Saiyaara to the beginning
 		const saiyaaraSong = playlist.splice(saiyaaraIndex, 1)[0];
 		playlist.unshift(saiyaaraSong);
-		log('🎵 Special Day Mode: Starting with Saiyaara!');
-		log('🎵 Playlist after special mode:', playlist.map(s => s.title).slice(0, 5));
+		log("🎵 Special Day Mode: Starting with Saiyaara!");
+		log("🎵 Playlist after special mode:", playlist.map((s) => s.title).slice(0, 5));
 	} else {
-		log('🎵 WARNING: Saiyaara not found in playlist - disabling special day mode');
-		log('🎵 Available songs:', playlist.map(s => s.title).slice(0, 5));
+		log("🎵 WARNING: Saiyaara not found in playlist - disabling special day mode");
+		log("🎵 Available songs:", playlist.map((s) => s.title).slice(0, 5));
 		SPECIAL_DAY_MODE = false; // Disable special mode if Saiyaara is not available
 	}
-	
+
 	return playlist;
 }
 
 // Function to generate playlist from available MP3 files
 async function generatePlaylist() {
 	if (isLoadingSongs) return playlist;
-	
+
 	isLoadingSongs = true;
-	
+
 	try {
 		// Try to fetch songs list from PHP script first
-		const response = await fetch('get-songs.php');
+		const response = await fetch("get-songs.php");
 		if (response.ok) {
 			const songFiles = await response.json();
-			log('Successfully loaded songs from PHP:', songFiles);
+			log("Successfully loaded songs from PHP:", songFiles);
 			playlist = createPlaylistFromFiles(songFiles);
 		} else {
-			throw new Error('PHP script not available');
+			throw new Error("PHP script not available");
 		}
 	} catch (error) {
-		log('PHP script not available, using fallback method:', error);
+		log("PHP script not available, using fallback method:", error);
 		// Fallback: try to discover songs by attempting to load them
 		playlist = await discoverSongsFallback();
 	}
-	
+
 	isLoadingSongs = false;
-	
-		// Apply special day mode if enabled
-		playlist = handleSpecialDayMode(playlist);
-		
-		log(
-			`Generated playlist with ${playlist.length} songs:`,
-			playlist.map((s) => s.title)
-		);
-		return playlist;
+
+	// Apply special day mode if enabled
+	playlist = handleSpecialDayMode(playlist);
+
+	log(
+		`Generated playlist with ${playlist.length} songs:`,
+		playlist.map((s) => s.title)
+	);
+	return playlist;
 }
 
 // Function to toggle special day mode (for easy switching)
 function toggleSpecialDayMode() {
 	SPECIAL_DAY_MODE = !SPECIAL_DAY_MODE;
-	log(`🎵 Special Day Mode: ${SPECIAL_DAY_MODE ? 'ENABLED' : 'DISABLED'}`);
-	
+	log(`🎵 Special Day Mode: ${SPECIAL_DAY_MODE ? "ENABLED" : "DISABLED"}`);
+
 	// Regenerate playlist with new mode
 	if (playlist.length > 0) {
 		generatePlaylist().then(() => {
@@ -170,7 +168,7 @@ async function discoverSongsFallback() {
 		"tum_hi_aana.mp3",
 		"tum_jo_aaye.mp3",
 	];
-	
+
 	return createPlaylistFromFiles(knownSongs);
 }
 
@@ -252,12 +250,20 @@ function setupEventListeners() {
 			stopAutoRotate();
 			// Start music on first user interaction
 			handleFirstUserInteraction();
+			// Close hamburger menu when navigation link is clicked
+			closeHamburgerMenu();
 		});
 	});
 
 	// Hamburger menu
 	const hamburger = document.querySelector(".hamburger");
 	const navMenu = document.querySelector(".nav-menu");
+
+	// Function to close hamburger menu
+	function closeHamburgerMenu() {
+		hamburger.classList.remove("active");
+		navMenu.classList.remove("active");
+	}
 
 	hamburger.addEventListener("click", () => {
 		hamburger.classList.toggle("active");
@@ -782,13 +788,11 @@ function startRandomMusic() {
 		songIndex = Math.floor(Math.random() * playlist.length);
 		log("🎵 Normal Mode: Playing random song");
 	}
-	
+
 	currentSongIndex = songIndex;
 
 	log(
-		`Playing song ${currentSongIndex + 1}/${playlist.length}: ${
-			playlist[currentSongIndex].title
-		}`
+		`Playing song ${currentSongIndex + 1}/${playlist.length}: ${playlist[currentSongIndex].title}`
 	);
 
 	// Start playing
@@ -1175,7 +1179,7 @@ function addNewTrip() {
 		mountain: "fas fa-mountain",
 		beach: "fas fa-umbrella-beach",
 		city: "fas fa-city",
-		heart: "fas fa-heart"
+		heart: "fas fa-heart",
 	};
 
 	const iconClass = iconMap[type] || "fas fa-heart";
@@ -1217,8 +1221,8 @@ function addNewTrip() {
 
 function formatDate(dateString) {
 	const date = new Date(dateString);
-	const options = { year: 'numeric', month: 'long', day: 'numeric' };
-	return date.toLocaleDateString('en-US', options);
+	const options = { year: "numeric", month: "long", day: "numeric" };
+	return date.toLocaleDateString("en-US", options);
 }
 
 function showTripAddedNotification(tripTitle) {
@@ -1256,7 +1260,7 @@ function showTripAddedNotification(tripTitle) {
 // Router functionality
 function initializeRouter() {
 	// Handle browser back/forward buttons
-	window.addEventListener('popstate', function(event) {
+	window.addEventListener("popstate", function (event) {
 		if (event.state && event.state.section) {
 			showSection(event.state.section);
 			updateActiveNavLink(document.querySelector(`.nav-link[href="#${event.state.section}"]`));
@@ -1266,8 +1270,8 @@ function initializeRouter() {
 	// Check if URL has a hash on page load
 	if (window.location.hash) {
 		const sectionId = window.location.hash.substring(1);
-		if (sectionId === 'games') {
-			showSection('games');
+		if (sectionId === "games") {
+			showSection("games");
 			updateActiveNavLink(document.querySelector('.nav-link[href="#games"]'));
 		}
 	}
@@ -1275,44 +1279,44 @@ function initializeRouter() {
 
 // Games functionality
 function openGame(gameType) {
-	if (gameType === 'snake') {
+	if (gameType === "snake") {
 		openSnakeGame();
-	} else if (gameType === 'coming-soon') {
+	} else if (gameType === "coming-soon") {
 		showComingSoonNotification();
 	}
 }
 
 function openSnakeGame() {
-	const modal = document.getElementById('snakeGameModal');
+	const modal = document.getElementById("snakeGameModal");
 	if (modal) {
-		modal.classList.add('active');
+		modal.classList.add("active");
 		initializeSnakeGame();
-		
+
 		// Update URL without page reload
-		history.pushState({ section: 'games', game: 'snake' }, '', '#games');
+		history.pushState({ section: "games", game: "snake" }, "", "#games");
 	}
 }
 
 function closeSnakeGame() {
-	const modal = document.getElementById('snakeGameModal');
+	const modal = document.getElementById("snakeGameModal");
 	if (modal) {
-		modal.classList.remove('active');
+		modal.classList.remove("active");
 		stopSnakeGame();
-		
+
 		// Reset URL
-		history.pushState({ section: 'games' }, '', '#games');
+		history.pushState({ section: "games" }, "", "#games");
 	}
 }
 
 // Snake Game Functions
 function initializeSnakeGame() {
-	snakeGame.canvas = document.getElementById('snakeCanvas');
+	snakeGame.canvas = document.getElementById("snakeCanvas");
 	if (!snakeGame.canvas) return;
-	
-	snakeGame.ctx = snakeGame.canvas.getContext('2d');
+
+	snakeGame.ctx = snakeGame.canvas.getContext("2d");
 	snakeGame.canvas.width = snakeGame.canvasSize;
 	snakeGame.canvas.height = snakeGame.canvasSize;
-	
+
 	// Reset game state
 	snakeGame.snake = [{ x: 200, y: 200 }];
 	snakeGame.direction = { x: 0, y: 0 };
@@ -1320,46 +1324,46 @@ function initializeSnakeGame() {
 	snakeGame.gameRunning = false;
 	snakeGame.gameSpeed = snakeGame.baseSpeed;
 	snakeGame.stage = 1;
-	
+
 	// Generate initial food
 	generateFood();
-	
+
 	// Draw initial state
 	drawSnakeGame();
-	
+
 	// Setup controls
 	setupSnakeControls();
 }
 
 function setupSnakeControls() {
 	// Keyboard controls
-	document.addEventListener('keydown', handleSnakeKeyPress);
-	
+	document.addEventListener("keydown", handleSnakeKeyPress);
+
 	// Touch controls for mobile
-	snakeGame.canvas.addEventListener('touchstart', handleSnakeTouchStart, { passive: false });
-	snakeGame.canvas.addEventListener('touchend', handleSnakeTouchEnd, { passive: false });
+	snakeGame.canvas.addEventListener("touchstart", handleSnakeTouchStart, { passive: false });
+	snakeGame.canvas.addEventListener("touchend", handleSnakeTouchEnd, { passive: false });
 }
 
 function handleSnakeKeyPress(e) {
 	if (!snakeGame.gameRunning) return;
-	
-	switch(e.key) {
-		case 'ArrowUp':
+
+	switch (e.key) {
+		case "ArrowUp":
 			if (snakeGame.direction.y === 0) {
 				snakeGame.direction = { x: 0, y: -snakeGame.gridSize };
 			}
 			break;
-		case 'ArrowDown':
+		case "ArrowDown":
 			if (snakeGame.direction.y === 0) {
 				snakeGame.direction = { x: 0, y: snakeGame.gridSize };
 			}
 			break;
-		case 'ArrowLeft':
+		case "ArrowLeft":
 			if (snakeGame.direction.x === 0) {
 				snakeGame.direction = { x: -snakeGame.gridSize, y: 0 };
 			}
 			break;
-		case 'ArrowRight':
+		case "ArrowRight":
 			if (snakeGame.direction.x === 0) {
 				snakeGame.direction = { x: snakeGame.gridSize, y: 0 };
 			}
@@ -1379,17 +1383,17 @@ function handleSnakeTouchStart(e) {
 function handleSnakeTouchEnd(e) {
 	e.preventDefault();
 	if (!snakeGame.gameRunning) return;
-	
+
 	const touch = e.changedTouches[0];
 	const rect = snakeGame.canvas.getBoundingClientRect();
 	const touchEndX = touch.clientX - rect.left;
 	const touchEndY = touch.clientY - rect.top;
-	
+
 	const deltaX = touchEndX - snakeGame.touchStartX;
 	const deltaY = touchEndY - snakeGame.touchStartY;
-	
+
 	const minSwipeDistance = 30;
-	
+
 	if (Math.abs(deltaX) > Math.abs(deltaY)) {
 		// Horizontal swipe
 		if (Math.abs(deltaX) > minSwipeDistance) {
@@ -1417,53 +1421,53 @@ function handleSnakeTouchEnd(e) {
 
 function startSnakeGame() {
 	if (snakeGame.gameRunning) return;
-	
+
 	snakeGame.gameRunning = true;
 	snakeGame.direction = { x: snakeGame.gridSize, y: 0 }; // Start moving right
-	
+
 	// Hide overlay
-	const overlay = document.getElementById('gameOverlay');
+	const overlay = document.getElementById("gameOverlay");
 	if (overlay) {
-		overlay.classList.add('hidden');
+		overlay.classList.add("hidden");
 	}
-	
+
 	// Update pause button
-	const pauseBtn = document.getElementById('pauseBtn');
+	const pauseBtn = document.getElementById("pauseBtn");
 	if (pauseBtn) {
 		pauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
 	}
-	
+
 	// Start game loop
 	snakeGame.gameLoop = setInterval(gameLoop, snakeGame.gameSpeed); // Dynamic speed based on stage
 }
 
 function pauseSnakeGame() {
 	if (!snakeGame.gameRunning) return;
-	
+
 	snakeGame.gameRunning = false;
 	clearInterval(snakeGame.gameLoop);
-	
+
 	// Show overlay
-	const overlay = document.getElementById('gameOverlay');
-	const overlayTitle = document.getElementById('overlayTitle');
-	const overlayMessage = document.getElementById('overlayMessage');
-	const startBtn = document.getElementById('startBtn');
-	
+	const overlay = document.getElementById("gameOverlay");
+	const overlayTitle = document.getElementById("overlayTitle");
+	const overlayMessage = document.getElementById("overlayMessage");
+	const startBtn = document.getElementById("startBtn");
+
 	if (overlay) {
-		overlay.classList.remove('hidden');
+		overlay.classList.remove("hidden");
 	}
 	if (overlayTitle) {
-		overlayTitle.textContent = 'Game Paused';
+		overlayTitle.textContent = "Game Paused";
 	}
 	if (overlayMessage) {
-		overlayMessage.textContent = 'Click resume to continue playing';
+		overlayMessage.textContent = "Click resume to continue playing";
 	}
 	if (startBtn) {
 		startBtn.innerHTML = '<i class="fas fa-play"></i> Resume Game';
 	}
-	
+
 	// Update pause button
-	const pauseBtn = document.getElementById('pauseBtn');
+	const pauseBtn = document.getElementById("pauseBtn");
 	if (pauseBtn) {
 		pauseBtn.innerHTML = '<i class="fas fa-play"></i>';
 	}
@@ -1478,32 +1482,32 @@ function restartSnakeGame() {
 	snakeGame.stage = 1;
 	generateFood();
 	drawSnakeGame();
-	
+
 	// Reset overlay
-	const overlay = document.getElementById('gameOverlay');
-	const overlayTitle = document.getElementById('overlayTitle');
-	const overlayMessage = document.getElementById('overlayMessage');
-	const startBtn = document.getElementById('startBtn');
-	
+	const overlay = document.getElementById("gameOverlay");
+	const overlayTitle = document.getElementById("overlayTitle");
+	const overlayMessage = document.getElementById("overlayMessage");
+	const startBtn = document.getElementById("startBtn");
+
 	if (overlay) {
-		overlay.classList.remove('hidden');
+		overlay.classList.remove("hidden");
 	}
 	if (overlayTitle) {
-		overlayTitle.textContent = 'Ready to Play?';
+		overlayTitle.textContent = "Ready to Play?";
 	}
 	if (overlayMessage) {
-		overlayMessage.textContent = 'Use arrow keys or swipe to control the snake';
+		overlayMessage.textContent = "Use arrow keys or swipe to control the snake";
 	}
 	if (startBtn) {
 		startBtn.innerHTML = '<i class="fas fa-play"></i> Start Game';
 	}
-	
+
 	// Update pause button
-	const pauseBtn = document.getElementById('pauseBtn');
+	const pauseBtn = document.getElementById("pauseBtn");
 	if (pauseBtn) {
 		pauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
 	}
-	
+
 	updateScore();
 }
 
@@ -1513,29 +1517,29 @@ function stopSnakeGame() {
 		clearInterval(snakeGame.gameLoop);
 		snakeGame.gameLoop = null;
 	}
-	
+
 	// Remove event listeners
-	document.removeEventListener('keydown', handleSnakeKeyPress);
+	document.removeEventListener("keydown", handleSnakeKeyPress);
 	if (snakeGame.canvas) {
-		snakeGame.canvas.removeEventListener('touchstart', handleSnakeTouchStart);
-		snakeGame.canvas.removeEventListener('touchend', handleSnakeTouchEnd);
+		snakeGame.canvas.removeEventListener("touchstart", handleSnakeTouchStart);
+		snakeGame.canvas.removeEventListener("touchend", handleSnakeTouchEnd);
 	}
 }
 
 function gameLoop() {
 	if (!snakeGame.gameRunning) return;
-	
+
 	moveSnake();
-	
+
 	if (checkCollision()) {
 		gameOver();
 		return;
 	}
-	
+
 	if (checkFoodCollision()) {
 		eatFood();
 	}
-	
+
 	drawSnakeGame();
 }
 
@@ -1543,34 +1547,34 @@ function moveSnake() {
 	const head = { ...snakeGame.snake[0] };
 	head.x += snakeGame.direction.x;
 	head.y += snakeGame.direction.y;
-	
+
 	// Apply wraparound boundaries
 	if (head.x < 0) {
 		head.x = snakeGame.canvasSize - snakeGame.gridSize;
 	} else if (head.x >= snakeGame.canvasSize) {
 		head.x = 0;
 	}
-	
+
 	if (head.y < 0) {
 		head.y = snakeGame.canvasSize - snakeGame.gridSize;
 	} else if (head.y >= snakeGame.canvasSize) {
 		head.y = 0;
 	}
-	
+
 	snakeGame.snake.unshift(head);
 	snakeGame.snake.pop();
 }
 
 function checkCollision() {
 	const head = snakeGame.snake[0];
-	
+
 	// Check self collision only (wraparound is handled in moveSnake)
 	for (let i = 1; i < snakeGame.snake.length; i++) {
 		if (head.x === snakeGame.snake[i].x && head.y === snakeGame.snake[i].y) {
 			return true;
 		}
 	}
-	
+
 	return false;
 }
 
@@ -1583,73 +1587,90 @@ function eatFood() {
 	snakeGame.score += 10;
 	snakeGame.snake.push({ ...snakeGame.snake[snakeGame.snake.length - 1] });
 	generateFood();
-	
+
 	// Check for stage progression (every 5 foods = new stage)
 	const newStage = Math.floor(snakeGame.score / 50) + 1;
 	if (newStage > snakeGame.stage) {
 		snakeGame.stage = newStage;
-		
+
 		// Add bonus score for reaching new stage
 		const stageBonus = snakeGame.stage * 25; // 25, 50, 75, 100... bonus points
 		snakeGame.score += stageBonus;
-		
+
 		// Increase speed (decrease interval time)
-		snakeGame.gameSpeed = Math.max(50, snakeGame.baseSpeed - (snakeGame.stage - 1) * snakeGame.speedIncrease);
-		
+		snakeGame.gameSpeed = Math.max(
+			50,
+			snakeGame.baseSpeed - (snakeGame.stage - 1) * snakeGame.speedIncrease
+		);
+
 		// Restart game loop with new speed
 		if (snakeGame.gameRunning) {
 			clearInterval(snakeGame.gameLoop);
 			snakeGame.gameLoop = setInterval(gameLoop, snakeGame.gameSpeed);
 		}
-		
+
 		// Show stage notification with bonus info
 		showStageNotification(snakeGame.stage, stageBonus);
 	}
-	
+
 	updateScore();
 }
 
 function generateFood() {
 	const maxX = Math.floor(snakeGame.canvasSize / snakeGame.gridSize) - 1;
 	const maxY = Math.floor(snakeGame.canvasSize / snakeGame.gridSize) - 1;
-	
+
 	do {
 		snakeGame.food.x = Math.floor(Math.random() * maxX) * snakeGame.gridSize;
 		snakeGame.food.y = Math.floor(Math.random() * maxY) * snakeGame.gridSize;
-	} while (snakeGame.snake.some(segment => segment.x === snakeGame.food.x && segment.y === snakeGame.food.y));
+	} while (
+		snakeGame.snake.some(
+			(segment) => segment.x === snakeGame.food.x && segment.y === snakeGame.food.y
+		)
+	);
 }
 
 function drawSnakeGame() {
 	if (!snakeGame.ctx) return;
-	
+
 	// Clear canvas
-	snakeGame.ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+	snakeGame.ctx.fillStyle = "rgba(0, 0, 0, 0.3)";
 	snakeGame.ctx.fillRect(0, 0, snakeGame.canvasSize, snakeGame.canvasSize);
-	
+
 	// Draw snake with consistent color
 	snakeGame.snake.forEach((segment, index) => {
 		// Same color for all segments - bright green
-		snakeGame.ctx.fillStyle = '#4CAF50';
+		snakeGame.ctx.fillStyle = "#4CAF50";
 		snakeGame.ctx.fillRect(segment.x, segment.y, snakeGame.gridSize - 1, snakeGame.gridSize - 1);
-		
+
 		// Add subtle border for definition
-		snakeGame.ctx.strokeStyle = '#2E7D32';
+		snakeGame.ctx.strokeStyle = "#2E7D32";
 		snakeGame.ctx.lineWidth = 1;
 		snakeGame.ctx.strokeRect(segment.x, segment.y, snakeGame.gridSize - 1, snakeGame.gridSize - 1);
 	});
-	
+
 	// Draw food with better visibility
-	snakeGame.ctx.fillStyle = '#FF5722';
-	snakeGame.ctx.fillRect(snakeGame.food.x, snakeGame.food.y, snakeGame.gridSize - 1, snakeGame.gridSize - 1);
-	
+	snakeGame.ctx.fillStyle = "#FF5722";
+	snakeGame.ctx.fillRect(
+		snakeGame.food.x,
+		snakeGame.food.y,
+		snakeGame.gridSize - 1,
+		snakeGame.gridSize - 1
+	);
+
 	// Add border to food
-	snakeGame.ctx.strokeStyle = '#D32F2F';
+	snakeGame.ctx.strokeStyle = "#D32F2F";
 	snakeGame.ctx.lineWidth = 2;
-	snakeGame.ctx.strokeRect(snakeGame.food.x, snakeGame.food.y, snakeGame.gridSize - 1, snakeGame.gridSize - 1);
+	snakeGame.ctx.strokeRect(
+		snakeGame.food.x,
+		snakeGame.food.y,
+		snakeGame.gridSize - 1,
+		snakeGame.gridSize - 1
+	);
 }
 
 function updateScore() {
-	const scoreElement = document.getElementById('snakeScore');
+	const scoreElement = document.getElementById("snakeScore");
 	if (scoreElement) {
 		scoreElement.textContent = snakeGame.score;
 	}
@@ -1694,18 +1715,18 @@ function showStageNotification(stage, bonus = 0) {
 function gameOver() {
 	snakeGame.gameRunning = false;
 	clearInterval(snakeGame.gameLoop);
-	
+
 	// Show game over overlay
-	const overlay = document.getElementById('gameOverlay');
-	const overlayTitle = document.getElementById('overlayTitle');
-	const overlayMessage = document.getElementById('overlayMessage');
-	const startBtn = document.getElementById('startBtn');
-	
+	const overlay = document.getElementById("gameOverlay");
+	const overlayTitle = document.getElementById("overlayTitle");
+	const overlayMessage = document.getElementById("overlayMessage");
+	const startBtn = document.getElementById("startBtn");
+
 	if (overlay) {
-		overlay.classList.remove('hidden');
+		overlay.classList.remove("hidden");
 	}
 	if (overlayTitle) {
-		overlayTitle.textContent = 'Game Over!';
+		overlayTitle.textContent = "Game Over!";
 	}
 	if (overlayMessage) {
 		overlayMessage.textContent = `Final Score: ${snakeGame.score}`;
@@ -1713,13 +1734,13 @@ function gameOver() {
 	if (startBtn) {
 		startBtn.innerHTML = '<i class="fas fa-redo"></i> Play Again';
 	}
-	
+
 	// Update pause button
-	const pauseBtn = document.getElementById('pauseBtn');
+	const pauseBtn = document.getElementById("pauseBtn");
 	if (pauseBtn) {
 		pauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
 	}
-	
+
 	// Show celebration for high scores
 	if (snakeGame.score > 50) {
 		createConfetti();
