@@ -24,7 +24,7 @@ let snakeGame = {
 	touchStartY: 0,
 	gameSpeed: 150, // Initial speed in milliseconds
 	baseSpeed: 150, // Base speed for calculations
-	speedIncrease: 10, // Speed increase per stage
+	speedIncrease: 2, // Very slow speed increase per stage (was 10)
 	stage: 1,
 };
 
@@ -336,6 +336,11 @@ function showSection(sectionId) {
 			} else if (sectionId === "madeby") {
 				animateMadeBySection();
 			}
+
+			// Resume auto-rotation if leaving games section and auto-rotation was enabled
+			if (currentSection !== "games" && isAutoRotating) {
+				startAutoRotate();
+			}
 		}
 	}, 150); // Ultra short transition time
 }
@@ -621,6 +626,11 @@ function startAutoRotate() {
 	}
 
 	autoRotateInterval = setInterval(() => {
+		// Don't auto-rotate if user is in games section (playing snake game)
+		if (currentSection === "games") {
+			return; // Stop auto-rotation when in games section
+		}
+
 		if (currentSection === "home") {
 			showSection("memories");
 			updateActiveNavLink(document.querySelector('.nav-link[href="#memories"]'));
@@ -633,9 +643,6 @@ function startAutoRotate() {
 		} else if (currentSection === "wishes") {
 			showSection("games");
 			updateActiveNavLink(document.querySelector('.nav-link[href="#games"]'));
-		} else if (currentSection === "games") {
-			showSection("madeby");
-			updateActiveNavLink(document.querySelector('.nav-link[href="#madeby"]'));
 		} else if (currentSection === "madeby") {
 			showSection("home");
 			updateActiveNavLink(document.querySelector('.nav-link[href="#home"]'));
@@ -1292,6 +1299,9 @@ function openSnakeGame() {
 		modal.classList.add("active");
 		initializeSnakeGame();
 
+		// Stop auto-rotation when opening snake game
+		stopAutoRotate();
+
 		// Update URL without page reload
 		history.pushState({ section: "games", game: "snake" }, "", "#games");
 	}
@@ -1305,6 +1315,11 @@ function closeSnakeGame() {
 
 		// Reset URL
 		history.pushState({ section: "games" }, "", "#games");
+
+		// Resume auto-rotation when leaving snake game
+		if (isAutoRotating) {
+			startAutoRotate();
+		}
 	}
 }
 
@@ -1322,7 +1337,7 @@ function initializeSnakeGame() {
 	snakeGame.direction = { x: 0, y: 0 };
 	snakeGame.score = 0;
 	snakeGame.gameRunning = false;
-	snakeGame.gameSpeed = snakeGame.baseSpeed;
+	snakeGame.gameSpeed = snakeGame.baseSpeed; // 150ms initial speed
 	snakeGame.stage = 1;
 
 	// Generate initial food
@@ -1584,22 +1599,22 @@ function checkFoodCollision() {
 }
 
 function eatFood() {
-	snakeGame.score += 10;
+	snakeGame.score += 5; // Reduced from 10 to 5 points per food
 	snakeGame.snake.push({ ...snakeGame.snake[snakeGame.snake.length - 1] });
 	generateFood();
 
-	// Check for stage progression (every 5 foods = new stage)
-	const newStage = Math.floor(snakeGame.score / 50) + 1;
+	// Check for stage progression (every 40 foods = new stage, very slow progression)
+	const newStage = Math.floor(snakeGame.score / 200) + 1; // Changed from 100 to 200 points per stage
 	if (newStage > snakeGame.stage) {
 		snakeGame.stage = newStage;
 
-		// Add bonus score for reaching new stage
-		const stageBonus = snakeGame.stage * 25; // 25, 50, 75, 100... bonus points
+		// Add very small bonus score for reaching new stage
+		const stageBonus = snakeGame.stage * 2; // 2, 4, 6, 8... bonus points (was 5, 10, 15, 20)
 		snakeGame.score += stageBonus;
 
-		// Increase speed (decrease interval time)
+		// Increase speed very slowly (decrease interval time gradually)
 		snakeGame.gameSpeed = Math.max(
-			50,
+			80, // Minimum speed (was 50, now slower)
 			snakeGame.baseSpeed - (snakeGame.stage - 1) * snakeGame.speedIncrease
 		);
 
