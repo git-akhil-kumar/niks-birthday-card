@@ -1,562 +1,711 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Happy Birthday! 🎉</title>
-    <link rel="icon" type="image/x-icon" href="/favicon.ico">
-    <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Dancing+Script:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-</head>
-<body>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Happy Birthday! 🎉</title>
+		<link rel="icon" type="image/x-icon" href="/favicon.ico" />
+		<link rel="stylesheet" href="styles.css" />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Dancing+Script:wght@400;600;700&display=swap"
+			rel="stylesheet"
+		/>
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+		/>
+	</head>
+	<body>
+		<!-- Background Elements -->
+		<div class="bg-elements">
+			<div class="floating-hearts"></div>
+			<div class="sparkles"></div>
+			<div class="confetti-container"></div>
+		</div>
 
-    <!-- Background Elements -->
-    <div class="bg-elements">
-        <div class="floating-hearts"></div>
-        <div class="sparkles"></div>
-        <div class="confetti-container"></div>
-    </div>
+		<!-- Navigation -->
+		<nav class="navbar">
+			<div class="nav-container">
+				<div class="nav-logo">
+					<i class="fas fa-heart"></i>
+					<span>Birthday Special</span>
+				</div>
+				<ul class="nav-menu">
+					<li><a href="#home" class="nav-link active">Home</a></li>
+					<li><a href="#memories" class="nav-link">Memories</a></li>
+					<li><a href="#trip" class="nav-link">Trip</a></li>
+					<li><a href="#wishes" class="nav-link">Wishes</a></li>
+					<li><a href="#games" class="nav-link">Games</a></li>
+					<li><a href="#madeby" class="nav-link">Made by</a></li>
+					<li>
+						<button class="back-btn" onclick="goBack()">
+							<i class="fas fa-arrow-left"></i>
+							Back
+						</button>
+					</li>
+					<li>
+						<button class="auto-rotate-btn" onclick="toggleAutoRotate()">
+							<i class="fas fa-sync-alt"></i>
+							Auto
+						</button>
+					</li>
+				</ul>
+				<div class="hamburger">
+					<span></span>
+					<span></span>
+					<span></span>
+				</div>
+			</div>
+		</nav>
 
-    <!-- Navigation -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <div class="nav-logo">
-                <i class="fas fa-heart"></i>
-                <span>Birthday Special</span>
-            </div>
-            <ul class="nav-menu">
-                <li><a href="#home" class="nav-link active">Home</a></li>
-                <li><a href="#memories" class="nav-link">Memories</a></li>
-                <li><a href="#trip" class="nav-link">Trip</a></li>
-                <li><a href="#wishes" class="nav-link">Wishes</a></li>
-                <li><a href="#games" class="nav-link">Games</a></li>
-                <li><a href="#madeby" class="nav-link">Made by</a></li>
-                <li><button class="back-btn" onclick="goBack()">
-                    <i class="fas fa-arrow-left"></i>
-                    Back
-                </button></li>
-                <li><button class="auto-rotate-btn" onclick="toggleAutoRotate()">
-                    <i class="fas fa-sync-alt"></i>
-                    Auto
-                </button></li>
-            </ul>
-            <div class="hamburger">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-        </div>
-    </nav>
+		<!-- Main Content -->
+		<main>
+			<!-- Home Section -->
+			<section id="home" class="section active">
+				<div class="hero-container">
+					<div class="hero-content">
+						<div class="home-content">
+							<div class="card-header">
+								<h1 class="birthday-title">
+									<span class="title-line">Happy</span>
+									<span class="title-line">Birthday!</span>
+								</h1>
+								<div class="birthday-icon">
+									<i class="fas fa-birthday-cake"></i>
+								</div>
+							</div>
+							<div class="card-body">
+								<div class="her-photo-container">
+									<img
+										src="static/optimized/her-images/2482db68-3859-4e90-aa51-b05dad4ea457.jpg"
+										alt="Birthday Girl"
+										class="her-photo"
+									/>
+								</div>
+								<p class="birthday-message">
+									Wishing you a day filled with love, laughter, and joy! 🎵
+								</p>
+								<div class="blessings-container">
+									<div class="blessing-item">
+										<span class="blessing-emoji">🎭</span>
+										<span class="blessing-text"
+											>May your life be more dramatic than Bigg Boss 19! (But in a good way!)</span
+										>
+									</div>
+									<div class="blessing-item">
+										<span class="blessing-emoji">🍿</span>
+										<span class="blessing-text"
+											>May you always have the best seat in the house, just like Salman Khan!</span
+										>
+									</div>
+									<div class="blessing-item">
+										<span class="blessing-emoji">💃</span>
+										<span class="blessing-text"
+											>May you dance through life with grace and joy!</span
+										>
+									</div>
+									<div class="blessing-item">
+										<span class="blessing-emoji">🎪</span>
+										<span class="blessing-text"
+											>May your year be more entertaining than Bigg Boss 18!</span
+										>
+									</div>
+									<div class="blessing-item">
+										<span class="blessing-emoji">🎬</span>
+										<span class="blessing-text">May every day be a blockbuster hit!</span>
+									</div>
+									<div class="blessing-item">
+										<span class="blessing-emoji">🌟</span>
+										<span class="blessing-text"
+											>May you shine brighter than the Bigg Boss trophy!</span
+										>
+									</div>
+								</div>
+								<div class="celebration-emoji">
+									<span>🎉</span>
+									<span>🎊</span>
+									<span>🎈</span>
+									<span>🎁</span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
 
-    <!-- Main Content -->
-    <main>
-        <!-- Home Section -->
-        <section id="home" class="section active">
-            <div class="hero-container">
-                <div class="hero-content">
-                    <div class="home-content">
-                        <div class="card-header">
-                            <h1 class="birthday-title">
-                                <span class="title-line">Happy</span>
-                                <span class="title-line">Birthday!</span>
-                            </h1>
-                            <div class="birthday-icon">
-                                <i class="fas fa-birthday-cake"></i>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <div class="her-photo-container">
-                                <img src="static/optimized/her-images/2482db68-3859-4e90-aa51-b05dad4ea457.jpg" alt="Birthday Girl" class="her-photo">
-                            </div>
-                            <p class="birthday-message">
-                                Wishing you a day filled with love, laughter, and joy! 🎵
-                            </p>
-                            <div class="blessings-container">
-                                <div class="blessing-item">
-                                    <span class="blessing-emoji">🎭</span>
-                                    <span class="blessing-text">May your life be more dramatic than Bigg Boss 19! (But in a good way!)</span>
-                                </div>
-                                <div class="blessing-item">
-                                    <span class="blessing-emoji">🍿</span>
-                                    <span class="blessing-text">May you always have the best seat in the house, just like Salman Khan!</span>
-                                </div>
-                                <div class="blessing-item">
-                                    <span class="blessing-emoji">💃</span>
-                                    <span class="blessing-text">May you dance through life with grace and joy!</span>
-                                </div>
-                                <div class="blessing-item">
-                                    <span class="blessing-emoji">🎪</span>
-                                    <span class="blessing-text">May your year be more entertaining than Bigg Boss 18!</span>
-                                </div>
-                                <div class="blessing-item">
-                                    <span class="blessing-emoji">🎬</span>
-                                    <span class="blessing-text">May every day be a blockbuster hit!</span>
-                                </div>
-                                <div class="blessing-item">
-                                    <span class="blessing-emoji">🌟</span>
-                                    <span class="blessing-text">May you shine brighter than the Bigg Boss trophy!</span>
-                                </div>
-                            </div>
-                            <div class="celebration-emoji">
-                                <span>🎉</span>
-                                <span>🎊</span>
-                                <span>🎈</span>
-                                <span>🎁</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
+			<!-- Memories Section -->
+			<section id="memories" class="section">
+				<div class="memories-container">
+					<h2 class="section-title">Our Beautiful Memories 💕</h2>
+					<div class="memories-grid">
+						<div class="memory-card" data-memory="1">
+							<div class="memory-image">
+								<img
+									src="static/optimized/our-images/4e39bba8-7d28-4ed8-95e1-fff4eb061999.jpg"
+									alt="Memory 1"
+									class="memory-photo"
+								/>
+							</div>
+							<div class="memory-content">
+								<h3>Beautiful Moment</h3>
+								<p class="memory-date">Sep 28, 2025</p>
+							</div>
+						</div>
+						<div class="memory-card" data-memory="2">
+							<div class="memory-image">
+								<img
+									src="static/optimized/our-images/cute-hand-picture.jpg"
+									alt="Memory 2"
+									class="memory-photo"
+								/>
+							</div>
+							<div class="memory-content">
+								<h3>Sweet Gesture</h3>
+								<p class="memory-date">Sep 28, 2025</p>
+							</div>
+						</div>
+						<div class="memory-card" data-memory="3">
+							<div class="memory-image">
+								<img
+									src="static/optimized/our-images/IMG_1303.JPG"
+									alt="Memory 3"
+									class="memory-photo"
+								/>
+							</div>
+							<div class="memory-content">
+								<h3>Adventure Time</h3>
+								<p class="memory-date">Sep 15, 2025</p>
+							</div>
+						</div>
+						<div class="memory-card" data-memory="4">
+							<div class="memory-image">
+								<img
+									src="static/optimized/our-images/IMG_1466.jpg"
+									alt="Memory 4"
+									class="memory-photo"
+								/>
+							</div>
+							<div class="memory-content">
+								<h3>Special Day</h3>
+								<p class="memory-date">Sep 17, 2025</p>
+							</div>
+						</div>
+						<div class="memory-card" data-memory="5">
+							<div class="memory-image">
+								<img
+									src="static/optimized/our-images/IMG_1472.jpg"
+									alt="Memory 5"
+									class="memory-photo"
+								/>
+							</div>
+							<div class="memory-content">
+								<h3>Memorable Time</h3>
+								<p class="memory-date">Sep 17, 2025</p>
+							</div>
+						</div>
+						<div class="memory-card" data-memory="6">
+							<div class="memory-image">
+								<img
+									src="static/optimized/our-images/IMG_1865.jpg"
+									alt="Memory 6"
+									class="memory-photo"
+								/>
+							</div>
+							<div class="memory-content">
+								<h3>Perfect Moment</h3>
+								<p class="memory-date">Sep 27, 2025</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
 
-        <!-- Memories Section -->
-        <section id="memories" class="section">
-            <div class="memories-container">
-                <h2 class="section-title">Our Beautiful Memories 💕</h2>
-                <div class="memories-grid">
-                    <div class="memory-card" data-memory="1">
-                        <div class="memory-image">
-                            <img src="static/optimized/our-images/4e39bba8-7d28-4ed8-95e1-fff4eb061999.jpg" alt="Memory 1" class="memory-photo">
-                        </div>
-                        <div class="memory-content">
-                            <h3>Beautiful Moment</h3>
-                            <p class="memory-date">Sep 28, 2025</p>
-                        </div>
-                    </div>
-                    <div class="memory-card" data-memory="2">
-                        <div class="memory-image">
-                            <img src="static/optimized/our-images/cute-hand-picture.jpg" alt="Memory 2" class="memory-photo">
-                        </div>
-                        <div class="memory-content">
-                            <h3>Sweet Gesture</h3>
-                            <p class="memory-date">Sep 28, 2025</p>
-                        </div>
-                    </div>
-                    <div class="memory-card" data-memory="3">
-                        <div class="memory-image">
-                            <img src="static/optimized/our-images/IMG_1303.JPG" alt="Memory 3" class="memory-photo">
-                        </div>
-                        <div class="memory-content">
-                            <h3>Adventure Time</h3>
-                            <p class="memory-date">Sep 15, 2025</p>
-                        </div>
-                    </div>
-                    <div class="memory-card" data-memory="4">
-                        <div class="memory-image">
-                            <img src="static/optimized/our-images/IMG_1466.jpg" alt="Memory 4" class="memory-photo">
-                        </div>
-                        <div class="memory-content">
-                            <h3>Special Day</h3>
-                            <p class="memory-date">Sep 17, 2025</p>
-                        </div>
-                    </div>
-                    <div class="memory-card" data-memory="5">
-                        <div class="memory-image">
-                            <img src="static/optimized/our-images/IMG_1472.jpg" alt="Memory 5" class="memory-photo">
-                        </div>
-                        <div class="memory-content">
-                            <h3>Memorable Time</h3>
-                            <p class="memory-date">Sep 17, 2025</p>
-                        </div>
-                    </div>
-                    <div class="memory-card" data-memory="6">
-                        <div class="memory-image">
-                            <img src="static/optimized/our-images/IMG_1865.jpg" alt="Memory 6" class="memory-photo">
-                        </div>
-                        <div class="memory-content">
-                            <h3>Perfect Moment</h3>
-                            <p class="memory-date">Sep 27, 2025</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
+			<!-- Trip Section -->
+			<section id="trip" class="section">
+				<div class="trip-container">
+					<h2 class="section-title">Our Journey Together ✈️</h2>
+					<p class="section-subtitle">One amazing trip down, many more adventures to plan!</p>
+					<div class="timeline">
+						<div class="timeline-item" data-date="Oct 1, 2024">
+							<div class="timeline-marker">
+								<i class="fas fa-plane"></i>
+							</div>
+							<div class="timeline-content">
+								<div class="timeline-date">October 1, 2024</div>
+								<h3 class="timeline-title">Goa Adventure</h3>
+								<div class="timeline-location">
+									<i class="fas fa-map-marker-alt"></i>
+									<span>Goa, India & US Adventure</span>
+								</div>
+								<p class="timeline-description">
+									Our first amazing trip together! We explored the beautiful beaches, enjoyed the
+									vibrant nightlife, and created unforgettable memories in the sunshine state of
+									India. Plus, we had an incredible US adventure that added even more magical
+									moments to our journey!
+								</p>
+								<div class="timeline-photos">
+									<div class="trip-image-container">
+										<img
+											src="static/optimized/trips/goa/goa-trip-image.jpg"
+											alt="Goa Trip Photo"
+											class="trip-image"
+										/>
+										<div class="trip-image-overlay">
+											<i class="fas fa-camera"></i>
+											<span>Our amazing Goa adventure!</span>
+										</div>
+									</div>
 
-        <!-- Trip Section -->
-        <section id="trip" class="section">
-            <div class="trip-container">
-                <h2 class="section-title">Our Journey Together ✈️</h2>
-                <p class="section-subtitle">One amazing trip down, many more adventures to plan!</p>
-                <div class="timeline">
-                    <div class="timeline-item" data-date="Oct 1, 2024">
-                        <div class="timeline-marker">
-                            <i class="fas fa-plane"></i>
-                        </div>
-                        <div class="timeline-content">
-                            <div class="timeline-date">October 1, 2024</div>
-                            <h3 class="timeline-title">Goa Adventure</h3>
-                            <div class="timeline-location">
-                                <i class="fas fa-map-marker-alt"></i>
-                                <span>Goa, India</span>
-                            </div>
-                            <p class="timeline-description">
-                                Our first amazing trip together! We explored the beautiful beaches, 
-                                enjoyed the vibrant nightlife, and created unforgettable memories 
-                                in the sunshine state of India.
-                            </p>
-                            <div class="timeline-photos">
-                                <div class="trip-image-container">
-                                    <img src="static/optimized/trips/goa/goa-trip-image.jpg" alt="Goa Trip Photo" class="trip-image">
-                                    <div class="trip-image-overlay">
-                                        <i class="fas fa-camera"></i>
-                                        <span>Our amazing Goa adventure!</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+									<!-- US Trip Gallery -->
+									<div class="trip-gallery">
+										<h4 class="gallery-title">
+											<i class="fas fa-plane"></i>
+											US Adventure Photos
+										</h4>
+										<div class="gallery-grid">
+											<div class="gallery-item">
+												<img
+													src="static/optimized/trips/goa/us/IMG_2108.jpg"
+													alt="US Trip Photo 1"
+													class="gallery-image"
+												/>
+												<div class="gallery-overlay">
+													<i class="fas fa-heart"></i>
+												</div>
+											</div>
+											<div class="gallery-item">
+												<img
+													src="static/optimized/trips/goa/us/IMG_2137.jpg"
+													alt="US Trip Photo 2"
+													class="gallery-image"
+												/>
+												<div class="gallery-overlay">
+													<i class="fas fa-heart"></i>
+												</div>
+											</div>
+											<div class="gallery-item">
+												<img
+													src="static/optimized/trips/goa/us/IMG_2151.jpg"
+													alt="US Trip Photo 3"
+													class="gallery-image"
+												/>
+												<div class="gallery-overlay">
+													<i class="fas fa-heart"></i>
+												</div>
+											</div>
+											<div class="gallery-item">
+												<img
+													src="static/optimized/trips/goa/us/IMG_2176.jpg"
+													alt="US Trip Photo 4"
+													class="gallery-image"
+												/>
+												<div class="gallery-overlay">
+													<i class="fas fa-heart"></i>
+												</div>
+											</div>
+											<div class="gallery-item">
+												<img
+													src="static/optimized/trips/goa/us/IMG_2232.jpg"
+													alt="US Trip Photo 5"
+													class="gallery-image"
+												/>
+												<div class="gallery-overlay">
+													<i class="fas fa-heart"></i>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
 
-                    <div class="timeline-item future" data-date="Dec 15, 2024">
-                        <div class="timeline-marker">
-                            <i class="fas fa-mountain"></i>
-                        </div>
-                        <div class="timeline-content">
-                            <div class="timeline-date">December 15, 2024</div>
-                            <h3 class="timeline-title">Mountain Retreat</h3>
-                            <div class="timeline-location">
-                                <i class="fas fa-map-marker-alt"></i>
-                                <span>Shimla, Himachal Pradesh</span>
-                            </div>
-                            <p class="timeline-description">
-                                Let's plan a cozy winter getaway in the hills! We'll enjoy the snow-capped mountains, 
-                                warm cups of chai, and peaceful walks in the pine forests. Perfect for a romantic escape!
-                            </p>
-                            <div class="timeline-photos">
-                                <div class="trip-image-container">
-                                    <img src="https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=400&h=300&fit=crop&crop=center" alt="Shimla Mountains" class="trip-image">
-                                    <div class="trip-image-overlay">
-                                        <i class="fas fa-mountain"></i>
-                                        <span>Planning our winter adventure...</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+						<div class="timeline-item future" data-date="Dec 15, 2024">
+							<div class="timeline-marker">
+								<i class="fas fa-mountain"></i>
+							</div>
+							<div class="timeline-content">
+								<div class="timeline-date">December 15, 2024</div>
+								<h3 class="timeline-title">Mountain Retreat</h3>
+								<div class="timeline-location">
+									<i class="fas fa-map-marker-alt"></i>
+									<span>Shimla, Himachal Pradesh</span>
+								</div>
+								<p class="timeline-description">
+									Let's plan a cozy winter getaway in the hills! We'll enjoy the snow-capped
+									mountains, warm cups of chai, and peaceful walks in the pine forests. Perfect for
+									a romantic escape!
+								</p>
+								<div class="timeline-photos">
+									<div class="trip-image-container">
+										<img
+											src="https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=400&h=300&fit=crop&crop=center"
+											alt="Shimla Mountains"
+											class="trip-image"
+										/>
+										<div class="trip-image-overlay">
+											<i class="fas fa-mountain"></i>
+											<span>Planning our winter adventure...</span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
 
-                    <div class="timeline-item future" data-date="Mar 20, 2025">
-                        <div class="timeline-marker">
-                            <i class="fas fa-heart"></i>
-                        </div>
-                        <div class="timeline-content">
-                            <div class="timeline-date">March 20, 2025</div>
-                            <h3 class="timeline-title">Spring Getaway</h3>
-                            <div class="timeline-location">
-                                <i class="fas fa-map-marker-alt"></i>
-                                <span>Kerala, India</span>
-                            </div>
-                            <p class="timeline-description">
-                                Let's plan our spring adventure to God's Own Country! We'll explore 
-                                the beautiful backwaters, enjoy the lush greenery, and experience 
-                                the rich culture together. Perfect timing for a romantic getaway!
-                            </p>
-                            <div class="timeline-photos">
-                                <div class="trip-image-container">
-                                    <img src="https://images.unsplash.com/photo-1593693397690-362cb9666fc2?w=400&h=300&fit=crop&crop=center" alt="Kerala Backwaters" class="trip-image">
-                                    <div class="trip-image-overlay">
-                                        <i class="fas fa-heart"></i>
-                                        <span>Planning our Kerala adventure...</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+						<div class="timeline-item future" data-date="Mar 20, 2025">
+							<div class="timeline-marker">
+								<i class="fas fa-heart"></i>
+							</div>
+							<div class="timeline-content">
+								<div class="timeline-date">March 20, 2025</div>
+								<h3 class="timeline-title">Spring Getaway</h3>
+								<div class="timeline-location">
+									<i class="fas fa-map-marker-alt"></i>
+									<span>Kerala, India</span>
+								</div>
+								<p class="timeline-description">
+									Let's plan our spring adventure to God's Own Country! We'll explore the beautiful
+									backwaters, enjoy the lush greenery, and experience the rich culture together.
+									Perfect timing for a romantic getaway!
+								</p>
+								<div class="timeline-photos">
+									<div class="trip-image-container">
+										<img
+											src="https://images.unsplash.com/photo-1593693397690-362cb9666fc2?w=400&h=300&fit=crop&crop=center"
+											alt="Kerala Backwaters"
+											class="trip-image"
+										/>
+										<div class="trip-image-overlay">
+											<i class="fas fa-heart"></i>
+											<span>Planning our Kerala adventure...</span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
 
-                    <div class="timeline-item future" data-date="Jun 10, 2025">
-                        <div class="timeline-marker">
-                            <i class="fas fa-sun"></i>
-                        </div>
-                        <div class="timeline-content">
-                            <div class="timeline-date">June 10, 2025</div>
-                            <h3 class="timeline-title">Summer Escape</h3>
-                            <div class="timeline-location">
-                                <i class="fas fa-map-marker-alt"></i>
-                                <span>Rajasthan, India</span>
-                            </div>
-                            <p class="timeline-description">
-                                Let's plan a royal experience in Rajasthan! We'll visit majestic palaces, 
-                                explore the desert, and immerse ourselves in the rich history and culture. 
-                                Perfect for creating unforgettable memories together!
-                            </p>
-                            <div class="timeline-photos">
-                                <div class="trip-image-container">
-                                    <img src="https://images.unsplash.com/photo-1599661046289-e31897846e41?w=400&h=300&fit=crop&crop=center" alt="Rajasthan Palace" class="trip-image">
-                                    <div class="trip-image-overlay">
-                                        <i class="fas fa-sun"></i>
-                                        <span>Planning our royal Rajasthan trip...</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+						<div class="timeline-item future" data-date="Jun 10, 2025">
+							<div class="timeline-marker">
+								<i class="fas fa-sun"></i>
+							</div>
+							<div class="timeline-content">
+								<div class="timeline-date">June 10, 2025</div>
+								<h3 class="timeline-title">Summer Escape</h3>
+								<div class="timeline-location">
+									<i class="fas fa-map-marker-alt"></i>
+									<span>Rajasthan, India</span>
+								</div>
+								<p class="timeline-description">
+									Let's plan a royal experience in Rajasthan! We'll visit majestic palaces, explore
+									the desert, and immerse ourselves in the rich history and culture. Perfect for
+									creating unforgettable memories together!
+								</p>
+								<div class="timeline-photos">
+									<div class="trip-image-container">
+										<img
+											src="https://images.unsplash.com/photo-1599661046289-e31897846e41?w=400&h=300&fit=crop&crop=center"
+											alt="Rajasthan Palace"
+											class="trip-image"
+										/>
+										<div class="trip-image-overlay">
+											<i class="fas fa-sun"></i>
+											<span>Planning our royal Rajasthan trip...</span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
 
-                    <div class="timeline-item future" data-date="Sep 5, 2025">
-                        <div class="timeline-marker">
-                            <i class="fas fa-globe-asia"></i>
-                        </div>
-                        <div class="timeline-content">
-                            <div class="timeline-date">September 5, 2025</div>
-                            <h3 class="timeline-title">International Adventure</h3>
-                            <div class="timeline-location">
-                                <i class="fas fa-map-marker-alt"></i>
-                                <span>Bali, Indonesia</span>
-                            </div>
-                            <p class="timeline-description">
-                                Let's plan our first international trip together! We'll explore 
-                                the beautiful temples, pristine beaches, and vibrant culture 
-                                of this tropical paradise. Time to get our passports ready!
-                            </p>
-                            <div class="timeline-photos">
-                                <div class="trip-image-container">
-                                    <img src="https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=400&h=300&fit=crop&crop=center" alt="Bali Temple" class="trip-image">
-                                    <div class="trip-image-overlay">
-                                        <i class="fas fa-globe-asia"></i>
-                                        <span>Planning our Bali adventure...</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+						<div class="timeline-item future" data-date="Sep 5, 2025">
+							<div class="timeline-marker">
+								<i class="fas fa-globe-asia"></i>
+							</div>
+							<div class="timeline-content">
+								<div class="timeline-date">September 5, 2025</div>
+								<h3 class="timeline-title">International Adventure</h3>
+								<div class="timeline-location">
+									<i class="fas fa-map-marker-alt"></i>
+									<span>Bali, Indonesia</span>
+								</div>
+								<p class="timeline-description">
+									Let's plan our first international trip together! We'll explore the beautiful
+									temples, pristine beaches, and vibrant culture of this tropical paradise. Time to
+									get our passports ready!
+								</p>
+								<div class="timeline-photos">
+									<div class="trip-image-container">
+										<img
+											src="https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=400&h=300&fit=crop&crop=center"
+											alt="Bali Temple"
+											class="trip-image"
+										/>
+										<div class="trip-image-overlay">
+											<i class="fas fa-globe-asia"></i>
+											<span>Planning our Bali adventure...</span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
 
-                    <!-- Add more timeline items here as needed -->
-                    <div class="timeline-item future" data-date="Dec 25, 2025">
-                        <div class="timeline-marker">
-                            <i class="fas fa-gift"></i>
-                        </div>
-                        <div class="timeline-content">
-                            <div class="timeline-date">December 25, 2025</div>
-                            <h3 class="timeline-title">Christmas Magic</h3>
-                            <div class="timeline-location">
-                                <i class="fas fa-map-marker-alt"></i>
-                                <span>Manali, Himachal Pradesh</span>
-                            </div>
-                            <p class="timeline-description">
-                                Let's plan a magical Christmas celebration in the snow! We'll enjoy 
-                                the winter wonderland, cozy cabin stays, and create beautiful 
-                                holiday memories together. Perfect for a romantic Christmas!
-                            </p>
-                            <div class="timeline-photos">
-                                <div class="trip-image-container">
-                                    <img src="https://images.unsplash.com/photo-1605554399-193d7b7ffcd0?w=400&h=300&fit=crop&crop=center" alt="Manali Snow" class="trip-image">
-                                    <div class="trip-image-overlay">
-                                        <i class="fas fa-gift"></i>
-                                        <span>Planning our Christmas magic...</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="timeline-footer">
-                    <div class="planning-notice">
-                        <i class="fas fa-lightbulb"></i>
-                        <span>All trips except Goa are planned adventures - let's make them happen together!</span>
-                    </div>
-                    <div class="add-trip-btn" onclick="showAddTripModal()">
-                        <i class="fas fa-plus"></i>
-                        <span>Add New Trip</span>
-                    </div>
-                </div>
-            </div>
-        </section>
+						<!-- Add more timeline items here as needed -->
+						<div class="timeline-item future" data-date="Dec 25, 2025">
+							<div class="timeline-marker">
+								<i class="fas fa-gift"></i>
+							</div>
+							<div class="timeline-content">
+								<div class="timeline-date">December 25, 2025</div>
+								<h3 class="timeline-title">Christmas Magic</h3>
+								<div class="timeline-location">
+									<i class="fas fa-map-marker-alt"></i>
+									<span>Manali, Himachal Pradesh</span>
+								</div>
+								<p class="timeline-description">
+									Let's plan a magical Christmas celebration in the snow! We'll enjoy the winter
+									wonderland, cozy cabin stays, and create beautiful holiday memories together.
+									Perfect for a romantic Christmas!
+								</p>
+								<div class="timeline-photos">
+									<div class="trip-image-container">
+										<img
+											src="https://images.unsplash.com/photo-1605554399-193d7b7ffcd0?w=400&h=300&fit=crop&crop=center"
+											alt="Manali Snow"
+											class="trip-image"
+										/>
+										<div class="trip-image-overlay">
+											<i class="fas fa-gift"></i>
+											<span>Planning our Christmas magic...</span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
 
-        <!-- Wishes Section -->
-        <section id="wishes" class="section">
-            <div class="wishes-container">
-                <h2 class="section-title">Birthday Wishes ✨</h2>
-                <div class="wishes-content">
-                    <div class="wish-card">
-                        <div class="wish-icon">
-                            <i class="fas fa-heart"></i>
-                        </div>
-                        <h3>Love & Happiness</h3>
-                        <p>May your special day be filled with endless love, joy, and happiness that lasts throughout the year!</p>
-                    </div>
-                    <div class="wish-card">
-                        <div class="wish-icon">
-                            <i class="fas fa-star"></i>
-                        </div>
-                        <h3>Dreams Come True</h3>
-                        <p>Wishing all your dreams and aspirations come true this year. You deserve every bit of success and happiness!</p>
-                    </div>
-                    <div class="wish-card">
-                        <div class="wish-icon">
-                            <i class="fas fa-music"></i>
-                        </div>
-                        <h3>Musical Journey</h3>
-                        <p>May your life be like a beautiful melody - full of love, joy, and wonderful moments!</p>
-                    </div>
-                    <div class="wish-card">
-                        <div class="wish-icon">
-                            <i class="fas fa-cake"></i>
-                        </div>
-                        <h3>Sweet Moments</h3>
-                        <p>Here's to another year of sweet moments, wonderful memories, and amazing adventures together!</p>
-                    </div>
-                </div>
-            </div>
-        </section>
+					<div class="timeline-footer">
+						<div class="planning-notice">
+							<i class="fas fa-lightbulb"></i>
+							<span
+								>All trips except Goa are planned adventures - let's make them happen
+								together!</span
+							>
+						</div>
+						<div class="add-trip-btn" onclick="showAddTripModal()">
+							<i class="fas fa-plus"></i>
+							<span>Add New Trip</span>
+						</div>
+					</div>
+				</div>
+			</section>
 
-        <!-- Games Section -->
-        <section id="games" class="section">
-            <div class="games-container">
-                <h2 class="section-title">Fun Games 🎮</h2>
-                <p class="section-subtitle">Let's have some fun together! Choose a game to play</p>
-                
-                <div class="games-grid">
-                    <div class="game-card" data-game="snake" onclick="openGame('snake')">
-                        <div class="game-icon">
-                            <i class="fas fa-gamepad"></i>
-                        </div>
-                        <div class="game-content">
-                            <h3>Snake Game</h3>
-                            <p>Classic snake game with smooth controls</p>
-                            <div class="game-stats">
-                                <span class="stat">
-                                    <i class="fas fa-star"></i>
-                                    Classic
-                                </span>
-                                <span class="stat">
-                                    <i class="fas fa-mobile-alt"></i>
-                                    Mobile Ready
-                                </span>
-                            </div>
-                        </div>
-                        <div class="play-button">
-                            <i class="fas fa-play"></i>
-                        </div>
-                    </div>
+			<!-- Wishes Section -->
+			<section id="wishes" class="section">
+				<div class="wishes-container">
+					<h2 class="section-title">Birthday Wishes ✨</h2>
+					<div class="wishes-content">
+						<div class="wish-card">
+							<div class="wish-icon">
+								<i class="fas fa-heart"></i>
+							</div>
+							<h3>Love & Happiness</h3>
+							<p>
+								May your special day be filled with endless love, joy, and happiness that lasts
+								throughout the year!
+							</p>
+						</div>
+						<div class="wish-card">
+							<div class="wish-icon">
+								<i class="fas fa-star"></i>
+							</div>
+							<h3>Dreams Come True</h3>
+							<p>
+								Wishing all your dreams and aspirations come true this year. You deserve every bit
+								of success and happiness!
+							</p>
+						</div>
+						<div class="wish-card">
+							<div class="wish-icon">
+								<i class="fas fa-music"></i>
+							</div>
+							<h3>Musical Journey</h3>
+							<p>
+								May your life be like a beautiful melody - full of love, joy, and wonderful moments!
+							</p>
+						</div>
+						<div class="wish-card">
+							<div class="wish-icon">
+								<i class="fas fa-cake"></i>
+							</div>
+							<h3>Sweet Moments</h3>
+							<p>
+								Here's to another year of sweet moments, wonderful memories, and amazing adventures
+								together!
+							</p>
+						</div>
+					</div>
+				</div>
+			</section>
 
-                    <div class="game-card coming-soon" data-game="coming-soon">
-                        <div class="game-icon">
-                            <i class="fas fa-puzzle-piece"></i>
-                        </div>
-                        <div class="game-content">
-                            <h3>More Games</h3>
-                            <p>Coming soon! More exciting games</p>
-                            <div class="game-stats">
-                                <span class="stat">
-                                    <i class="fas fa-clock"></i>
-                                    Coming Soon
-                                </span>
-                            </div>
-                        </div>
-                        <div class="play-button disabled">
-                            <i class="fas fa-lock"></i>
-                        </div>
-                    </div>
-                </div>
+			<!-- Games Section -->
+			<section id="games" class="section">
+				<div class="games-container">
+					<h2 class="section-title">Fun Games 🎮</h2>
+					<p class="section-subtitle">Let's have some fun together! Choose a game to play</p>
 
-                <div class="games-footer">
-                </div>
-            </div>
-        </section>
+					<div class="games-grid">
+						<div class="game-card" data-game="snake" onclick="openGame('snake')">
+							<div class="game-icon">
+								<i class="fas fa-gamepad"></i>
+							</div>
+							<div class="game-content">
+								<h3>Snake Game</h3>
+								<p>Classic snake game with smooth controls</p>
+								<div class="game-stats">
+									<span class="stat">
+										<i class="fas fa-star"></i>
+										Classic
+									</span>
+									<span class="stat">
+										<i class="fas fa-mobile-alt"></i>
+										Mobile Ready
+									</span>
+								</div>
+							</div>
+							<div class="play-button">
+								<i class="fas fa-play"></i>
+							</div>
+						</div>
 
-        <!-- Made by Section -->
-        <section id="madeby" class="section">
-            <div class="container">
-                <div class="made-by-container">
-                    <div class="made-by-card">
-                        <div class="made-by-header">
-                            <h2 class="made-by-title">Made with Love</h2>
-                            <div class="heart-divider">
-                                <i class="fas fa-heart"></i>
-                                <i class="fas fa-heart"></i>
-                                <i class="fas fa-heart"></i>
-                            </div>
-                        </div>
-                        
-                        <div class="made-by-content">
-                            <div class="creator-photo-container">
-                                <img src="static/optimized/my-images/IMG_1218.jpg" alt="Akhil" class="creator-photo">
-                                <div class="photo-frame"></div>
-                            </div>
-                            
-                            <div class="creator-message">
-                                <h3 class="creator-name">Made by <span class="highlight">YOURS AKHIL</span></h3>
-                                <p class="love-message">with my absolute love ❤️</p>
-                                
-                                <div class="love-details">
-                                    <div class="love-item">
-                                        <i class="fas fa-code"></i>
-                                        <span>Crafted with passion</span>
-                                    </div>
-                                    <div class="love-item">
-                                        <i class="fas fa-music"></i>
-                                        <span>Filled with your favorite songs</span>
-                                    </div>
-                                    <div class="love-item">
-                                        <i class="fas fa-heart"></i>
-                                        <span>Made with endless love</span>
-                                    </div>
-                                </div>
-                                
-                                <div class="signature">
-                                    <p>Every line of code, every animation, every song - all for you, my love 💕</p>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="made-by-footer">
-                            <div class="floating-hearts-small">
-                                <i class="fas fa-heart"></i>
-                                <i class="fas fa-heart"></i>
-                                <i class="fas fa-heart"></i>
-                                <i class="fas fa-heart"></i>
-                                <i class="fas fa-heart"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
+						<div class="game-card coming-soon" data-game="coming-soon">
+							<div class="game-icon">
+								<i class="fas fa-puzzle-piece"></i>
+							</div>
+							<div class="game-content">
+								<h3>More Games</h3>
+								<p>Coming soon! More exciting games</p>
+								<div class="game-stats">
+									<span class="stat">
+										<i class="fas fa-clock"></i>
+										Coming Soon
+									</span>
+								</div>
+							</div>
+							<div class="play-button disabled">
+								<i class="fas fa-lock"></i>
+							</div>
+						</div>
+					</div>
 
-    </main>
+					<div class="games-footer"></div>
+				</div>
+			</section>
 
-    <!-- Audio Element -->
-    <audio id="audioPlayer" preload="metadata">
-        <source src="" type="audio/mpeg">
-    </audio>
+			<!-- Made by Section -->
+			<section id="madeby" class="section">
+				<div class="container">
+					<div class="made-by-container">
+						<div class="made-by-card">
+							<div class="made-by-header">
+								<h2 class="made-by-title">Made with Love</h2>
+								<div class="heart-divider">
+									<i class="fas fa-heart"></i>
+									<i class="fas fa-heart"></i>
+									<i class="fas fa-heart"></i>
+								</div>
+							</div>
 
-    <!-- Snake Game Modal -->
-    <div id="snakeGameModal" class="game-modal">
-        <div class="game-modal-content">
-            <div class="game-header">
-                <h3>Snake Game 🐍</h3>
-                <div class="game-controls">
-                    <div class="score-display">
-                        <span>Score: <span id="snakeScore">0</span></span>
-                    </div>
-                    <button class="game-btn" onclick="pauseSnakeGame()" id="pauseBtn">
-                        <i class="fas fa-pause"></i>
-                    </button>
-                    <button class="game-btn" onclick="restartSnakeGame()">
-                        <i class="fas fa-redo"></i>
-                    </button>
-                    <button class="game-btn close-game" onclick="closeSnakeGame()">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-            </div>
-            
-            <div class="game-area">
-                <canvas id="snakeCanvas" width="400" height="400"></canvas>
-                <div class="game-overlay" id="gameOverlay">
-                    <div class="overlay-content">
-                        <h2 id="overlayTitle">Ready to Play?</h2>
-                        <p id="overlayMessage">Use arrow keys or swipe to control the snake</p>
-                        <button class="start-btn" onclick="startSnakeGame()" id="startBtn">
-                            <i class="fas fa-play"></i>
-                            Start Game
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+							<div class="made-by-content">
+								<div class="creator-photo-container">
+									<img
+										src="static/optimized/my-images/IMG_1218.jpg"
+										alt="Akhil"
+										class="creator-photo"
+									/>
+									<div class="photo-frame"></div>
+								</div>
 
-    <!-- Scripts -->
-    <script src="script.js"></script>
-</body>
+								<div class="creator-message">
+									<h3 class="creator-name">Made by <span class="highlight">YOURS AKHIL</span></h3>
+									<p class="love-message">with my absolute love ❤️</p>
+
+									<div class="love-details">
+										<div class="love-item">
+											<i class="fas fa-code"></i>
+											<span>Crafted with passion</span>
+										</div>
+										<div class="love-item">
+											<i class="fas fa-music"></i>
+											<span>Filled with your favorite songs</span>
+										</div>
+										<div class="love-item">
+											<i class="fas fa-heart"></i>
+											<span>Made with endless love</span>
+										</div>
+									</div>
+
+									<div class="signature">
+										<p>Every line of code, every animation, every song - all for you, my love 💕</p>
+									</div>
+								</div>
+							</div>
+
+							<div class="made-by-footer">
+								<div class="floating-hearts-small">
+									<i class="fas fa-heart"></i>
+									<i class="fas fa-heart"></i>
+									<i class="fas fa-heart"></i>
+									<i class="fas fa-heart"></i>
+									<i class="fas fa-heart"></i>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</main>
+
+		<!-- Audio Element -->
+		<audio id="audioPlayer" preload="metadata">
+			<source src="" type="audio/mpeg" />
+		</audio>
+
+		<!-- Snake Game Modal -->
+		<div id="snakeGameModal" class="game-modal">
+			<div class="game-modal-content">
+				<div class="game-header">
+					<h3>Snake Game 🐍</h3>
+					<div class="game-controls">
+						<div class="score-display">
+							<span>Score: <span id="snakeScore">0</span></span>
+						</div>
+						<button class="game-btn" onclick="pauseSnakeGame()" id="pauseBtn">
+							<i class="fas fa-pause"></i>
+						</button>
+						<button class="game-btn" onclick="restartSnakeGame()">
+							<i class="fas fa-redo"></i>
+						</button>
+						<button class="game-btn close-game" onclick="closeSnakeGame()">
+							<i class="fas fa-times"></i>
+						</button>
+					</div>
+				</div>
+
+				<div class="game-area">
+					<canvas id="snakeCanvas" width="400" height="400"></canvas>
+					<div class="game-overlay" id="gameOverlay">
+						<div class="overlay-content">
+							<h2 id="overlayTitle">Ready to Play?</h2>
+							<p id="overlayMessage">Use arrow keys or swipe to control the snake</p>
+							<button class="start-btn" onclick="startSnakeGame()" id="startBtn">
+								<i class="fas fa-play"></i>
+								Start Game
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Scripts -->
+		<script src="script.js"></script>
+	</body>
 </html>
