@@ -1,24 +1,31 @@
-// Production-safe logging
-const DEBUG = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-const log = DEBUG ? console.log : () => {};
-const logError = DEBUG ? console.error : () => {};
-const logWarn = DEBUG ? console.warn : () => {};
+// Global Variables
+let currentSongIndex = 0;
+let isPlaying = false;
+let audioPlayer = null;
+let currentSection = "home";
+let autoRotateInterval = null;
+let isAutoRotating = false;
+let hasUserInteracted = false;
+let pendingSongIndex = null;
 
 // Snake Game Variables
 let snakeGame = {
-    canvas: null,
-    ctx: null,
-    snake: [{ x: 200, y: 200 }],
-    direction: { x: 0, y: 0 },
-    food: { x: 0, y: 0 },
-    score: 0,
-    gameRunning: false,
-    gameLoop: null,
-    gridSize: 20,
-    canvasSize: 400,
-    touchStartX: 0,
-    touchStartY: 0,
-    gameSpeed: 150, // Fixed speed in milliseconds
+	canvas: null,
+	ctx: null,
+	snake: [{ x: 200, y: 200 }],
+	direction: { x: 0, y: 0 },
+	food: { x: 0, y: 0 },
+	score: 0,
+	gameRunning: false,
+	gameLoop: null,
+	gridSize: 20,
+	canvasSize: 400,
+	touchStartX: 0,
+	touchStartY: 0,
+	gameSpeed: 150, // Initial speed in milliseconds
+	baseSpeed: 150, // Base speed for calculations
+	speedIncrease: 2, // Very slow speed increase per stage (was 10)
+	stage: 1,
 };
 
 // Environment detection
@@ -30,7 +37,7 @@ const isLocal =
 // Console logging function - only logs in local development
 function log(...args) {
 	if (isLocal) {
-		log(...args);
+		console.log(...args);
 	}
 }
 
@@ -78,12 +85,17 @@ async function generatePlaylist() {
 	isLoadingSongs = true;
 
 	try {
-		// Use the songs list from songs-list.js
-		log('Loading songs from songs-list.js');
-		playlist = createPlaylistFromFiles(availableSongs);
-		log('Successfully loaded songs:', availableSongs.length, 'songs');
+		// Try to fetch songs list from PHP script first
+		const response = await fetch("get-songs.php");
+		if (response.ok) {
+			const songFiles = await response.json();
+			log("Successfully loaded songs from PHP:", songFiles);
+			playlist = createPlaylistFromFiles(songFiles);
+		} else {
+			throw new Error("PHP script not available");
+		}
 	} catch (error) {
-		log('Error loading songs, using fallback method:', error);
+		log("PHP script not available, using fallback method:", error);
 		// Fallback: try to discover songs by attempting to load them
 		playlist = await discoverSongsFallback();
 	}
@@ -238,14 +250,8 @@ function setupEventListeners() {
 			stopAutoRotate();
 			// Start music on first user interaction
 			handleFirstUserInteraction();
-			
-			// Auto-close mobile menu after navigation
-			const hamburger = document.querySelector(".hamburger");
-			const navMenu = document.querySelector(".nav-menu");
-			if (hamburger && navMenu) {
-				hamburger.classList.remove("active");
-				navMenu.classList.remove("active");
-			}
+			// Close hamburger menu when navigation link is clicked
+			closeHamburgerMenu();
 		});
 	});
 
@@ -264,20 +270,6 @@ function setupEventListeners() {
 		navMenu.classList.toggle("active");
 		// Start music on first user interaction
 		handleFirstUserInteraction();
-	});
-
-	// Close mobile menu when clicking outside
-	document.addEventListener("click", (e) => {
-		const hamburger = document.querySelector(".hamburger");
-		const navMenu = document.querySelector(".nav-menu");
-		
-		if (hamburger && navMenu && 
-			!hamburger.contains(e.target) && 
-			!navMenu.contains(e.target) &&
-			navMenu.classList.contains("active")) {
-			hamburger.classList.remove("active");
-			navMenu.classList.remove("active");
-		}
 	});
 
 	// Memory cards - removed click functionality for details
@@ -581,7 +573,7 @@ function startCelebration() {
 	if (audioPlayer) {
 		audioPlayer.src = "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav";
 		audioPlayer.play().catch(() => {
-			log("Celebration sound not available");
+			console.log("Celebration sound not available");
 		});
 	}
 
@@ -1345,7 +1337,9 @@ function initializeSnakeGame() {
 	snakeGame.direction = { x: 0, y: 0 };
 	snakeGame.score = 0;
 	snakeGame.gameRunning = false;
-	
+	snakeGame.gameSpeed = snakeGame.baseSpeed; // 150ms initial speed
+	snakeGame.stage = 1;
+
 	// Generate initial food
 	generateFood();
 
@@ -1459,7 +1453,7 @@ function startSnakeGame() {
 	}
 
 	// Start game loop
-	snakeGame.gameLoop = setInterval(gameLoop, snakeGame.gameSpeed);
+	snakeGame.gameLoop = setInterval(gameLoop, snakeGame.gameSpeed); // Dynamic speed based on stage
 }
 
 function pauseSnakeGame() {
@@ -1499,6 +1493,8 @@ function restartSnakeGame() {
 	snakeGame.snake = [{ x: 200, y: 200 }];
 	snakeGame.direction = { x: 0, y: 0 };
 	snakeGame.score = 0;
+	snakeGame.gameSpeed = snakeGame.baseSpeed;
+	snakeGame.stage = 1;
 	generateFood();
 	drawSnakeGame();
 
@@ -1606,7 +1602,32 @@ function eatFood() {
 	snakeGame.score += 5; // Reduced from 10 to 5 points per food
 	snakeGame.snake.push({ ...snakeGame.snake[snakeGame.snake.length - 1] });
 	generateFood();
-	
+
+	// Check for stage progression (every 40 foods = new stage, very slow progression)
+	const newStage = Math.floor(snakeGame.score / 200) + 1; // Changed from 100 to 200 points per stage
+	if (newStage > snakeGame.stage) {
+		snakeGame.stage = newStage;
+
+		// Add very small bonus score for reaching new stage
+		const stageBonus = snakeGame.stage * 2; // 2, 4, 6, 8... bonus points (was 5, 10, 15, 20)
+		snakeGame.score += stageBonus;
+
+		// Increase speed very slowly (decrease interval time gradually)
+		snakeGame.gameSpeed = Math.max(
+			80, // Minimum speed (was 50, now slower)
+			snakeGame.baseSpeed - (snakeGame.stage - 1) * snakeGame.speedIncrease
+		);
+
+		// Restart game loop with new speed
+		if (snakeGame.gameRunning) {
+			clearInterval(snakeGame.gameLoop);
+			snakeGame.gameLoop = setInterval(gameLoop, snakeGame.gameSpeed);
+		}
+
+		// Show stage notification with bonus info
+		showStageNotification(snakeGame.stage, stageBonus);
+	}
+
 	updateScore();
 }
 
@@ -1670,6 +1691,41 @@ function updateScore() {
 	}
 }
 
+function showStageNotification(stage, bonus = 0) {
+	const notification = document.createElement("div");
+	notification.innerHTML = bonus > 0 ? `🚀 Stage ${stage}! +${bonus} Bonus!` : `🚀 Stage ${stage}`;
+	notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(102, 126, 234, 0.9);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 15px;
+        z-index: 10001;
+        font-size: 0.9rem;
+        font-weight: 600;
+        animation: stageNotificationSubtle 1.5s ease;
+        text-align: center;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        backdrop-filter: blur(10px);
+        pointer-events: none;
+    `;
+
+	document.body.appendChild(notification);
+
+	setTimeout(() => {
+		if (notification.parentNode) {
+			notification.style.animation = "fadeOut 0.3s ease";
+			setTimeout(() => {
+				if (notification.parentNode) {
+					notification.parentNode.removeChild(notification);
+				}
+			}, 300);
+		}
+	}, 1200);
+}
 
 function gameOver() {
 	snakeGame.gameRunning = false;
@@ -1828,113 +1884,3 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
-
-// Photo Modal Functions
-function openPhotoModal(imageSrc, caption) {
-	log('Opening photo modal:', imageSrc, caption);
-
-	const modal = document.getElementById('photoModal');
-	const modalPhoto = document.getElementById('modalPhoto');
-	const modalCaption = document.getElementById('modalCaption');
-
-	if (!modal) {
-		logError('Photo modal not found');
-		return;
-	}
-
-	if (!modalPhoto) {
-		logError('Modal photo element not found');
-		return;
-	}
-
-	if (!modalCaption) {
-		logError('Modal caption element not found');
-		return;
-	}
-	
-	log('All elements found, proceeding with modal opening...');
-	
-	try {
-		modalPhoto.src = imageSrc;
-		log('Image source set to:', imageSrc);
-		
-		modalPhoto.onerror = function() {
-			logError('Failed to load image:', imageSrc);
-			this.style.display = 'none';
-			modalCaption.innerHTML = `
-				<div style="text-align: center; padding: 2rem;">
-					<i class="fas fa-image" style="font-size: 3rem; color: #ff6b9d; margin-bottom: 1rem;"></i>
-					<h3 style="color: #fff; margin-bottom: 0.5rem;">Photo Coming Soon!</h3>
-					<p style="color: rgba(255,255,255,0.8); margin: 0;">${caption}</p>
-					<p style="color: rgba(255,255,255,0.6); font-size: 0.9rem; margin-top: 1rem;">We're working on making this photo available</p>
-				</div>
-			`;
-		};
-		
-		modalPhoto.onload = function() {
-			log('Image loaded successfully:', imageSrc);
-			modalCaption.textContent = caption;
-		};
-		
-		modal.classList.add('active');
-		log('Modal class added, modal should be visible now');
-		
-		// Prevent body scroll when modal is open
-		document.body.style.overflow = 'hidden';
-		
-		log('Photo modal opened successfully');
-	} catch (error) {
-		logError('Error opening photo modal:', error);
-	}
-}
-
-function closePhotoModal() {
-	log('Closing photo modal');
-	
-	const modal = document.getElementById('photoModal');
-	if (modal) {
-		modal.classList.remove('active');
-		
-		// Restore body scroll
-		document.body.style.overflow = 'auto';
-		
-		log('Photo modal closed successfully');
-	}
-}
-
-// Close modal when clicking outside the image
-document.addEventListener('click', function(event) {
-	const modal = document.getElementById('photoModal');
-	const modalContent = document.querySelector('.photo-modal-content');
-	
-	if (modal && modal.classList.contains('active') && 
-		event.target === modal && !modalContent.contains(event.target)) {
-		closePhotoModal();
-	}
-});
-
-// Close modal with Escape key
-document.addEventListener('keydown', function(event) {
-	if (event.key === 'Escape') {
-		const modal = document.getElementById('photoModal');
-		if (modal && modal.classList.contains('active')) {
-			closePhotoModal();
-		}
-	}
-});
-
-// Ensure functions are available globally
-window.openPhotoModal = openPhotoModal;
-window.closePhotoModal = closePhotoModal;
-
-// Test photo modal elements on page load
-document.addEventListener('DOMContentLoaded', function() {
-	log('Testing photo modal elements...');
-	const modal = document.getElementById('photoModal');
-	const modalPhoto = document.getElementById('modalPhoto');
-	const modalCaption = document.getElementById('modalCaption');
-	
-	log('Modal element:', modal ? 'Found' : 'Not found');
-	log('Modal photo element:', modalPhoto ? 'Found' : 'Not found');
-	log('Modal caption element:', modalCaption ? 'Found' : 'Not found');
-});
