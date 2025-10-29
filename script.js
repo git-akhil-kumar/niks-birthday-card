@@ -1288,7 +1288,13 @@ function initializeRouter() {
 function openGame(gameType) {
 	if (gameType === "snake") {
 		openSnakeGame();
-	} else if (gameType === "coming-soon") {
+	} else if (gameType === "game2048") {
+		open2048Game();
+	} else if (gameType === "tictactoe") {
+		openTicTacToeGame();
+	} else if (gameType === "breakout") {
+		openBreakoutGame();
+	} else {
 		showComingSoonNotification();
 	}
 }
@@ -1320,6 +1326,60 @@ function closeSnakeGame() {
 		if (isAutoRotating) {
 			startAutoRotate();
 		}
+	}
+}
+
+// New Games Functions
+function open2048Game() {
+	const modal = document.getElementById('game2048Modal');
+	if (modal) {
+		modal.classList.add('active');
+		history.pushState({ section: 'games', game: '2048' }, '', '#games');
+		setTimeout(() => init2048(), 100);
+	}
+}
+
+function close2048Game() {
+	const modal = document.getElementById('game2048Modal');
+	if (modal) {
+		modal.classList.remove('active');
+		history.pushState({ section: 'games' }, '', '#games');
+	}
+}
+
+function openTicTacToeGame() {
+	const modal = document.getElementById('tictactoeModal');
+	if (modal) {
+		modal.classList.add('active');
+		history.pushState({ section: 'games', game: 'tictactoe' }, '', '#games');
+		setTimeout(() => initTicTacToe(), 100);
+	}
+}
+
+function closeTicTacToeGame() {
+	const modal = document.getElementById('tictactoeModal');
+	if (modal) {
+		modal.classList.remove('active');
+		history.pushState({ section: 'games' }, '', '#games');
+	}
+}
+
+function openBreakoutGame() {
+	const modal = document.getElementById('breakoutModal');
+	if (modal) {
+		modal.classList.add('active');
+		history.pushState({ section: 'games', game: 'breakout' }, '', '#games');
+		setTimeout(() => initBreakout(), 100);
+	}
+}
+
+function closeBreakoutGame() {
+	const modal = document.getElementById('breakoutModal');
+	if (modal) {
+		modal.classList.remove('active');
+		breakout.gameRunning = false;
+		if (breakout.gameInterval) cancelAnimationFrame(breakout.gameInterval);
+		history.pushState({ section: 'games' }, '', '#games');
 	}
 }
 

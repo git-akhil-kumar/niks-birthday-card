@@ -14,6 +14,10 @@
 			rel="stylesheet"
 			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
 		/>
+		<!-- Game Styles -->
+		<link rel="stylesheet" href="games/2048/game2048.css">
+		<link rel="stylesheet" href="games/tic-tac-toe/tictactoe.css">
+		<link rel="stylesheet" href="games/brick-breaker/breakout.css">
 	</head>
 	<body>
 		<!-- Background Elements -->
@@ -575,24 +579,74 @@
 							</div>
 						</div>
 
-						<div class="game-card coming-soon" data-game="coming-soon">
-							<div class="game-icon">
-								<i class="fas fa-puzzle-piece"></i>
-							</div>
-							<div class="game-content">
-								<h3>More Games</h3>
-								<p>Coming soon! More exciting games</p>
-								<div class="game-stats">
-									<span class="stat">
-										<i class="fas fa-clock"></i>
-										Coming Soon
-									</span>
-								</div>
-							</div>
-							<div class="play-button disabled">
-								<i class="fas fa-lock"></i>
+					<div class="game-card" data-game="game2048" onclick="openGame('game2048')">
+						<div class="game-icon">
+							<i class="fas fa-th"></i>
+						</div>
+						<div class="game-content">
+							<h3>2048 Game</h3>
+							<p>Combine tiles to reach 2048!</p>
+							<div class="game-stats">
+								<span class="stat">
+									<i class="fas fa-brain"></i>
+									Strategy
+								</span>
+								<span class="stat">
+									<i class="fas fa-star"></i>
+									Addictive
+								</span>
 							</div>
 						</div>
+						<div class="play-button">
+							<i class="fas fa-play"></i>
+						</div>
+					</div>
+
+					<div class="game-card" data-game="tictactoe" onclick="openGame('tictactoe')">
+						<div class="game-icon">
+							<i class="fas fa-times"></i>
+						</div>
+						<div class="game-content">
+							<h3>Tic Tac Toe</h3>
+							<p>Play against smart AI</p>
+							<div class="game-stats">
+								<span class="stat">
+									<i class="fas fa-robot"></i>
+									AI Opponent
+								</span>
+								<span class="stat">
+									<i class="fas fa-chess"></i>
+									Classic
+								</span>
+							</div>
+						</div>
+						<div class="play-button">
+							<i class="fas fa-play"></i>
+						</div>
+					</div>
+
+					<div class="game-card" data-game="breakout" onclick="openGame('breakout')">
+						<div class="game-icon">
+							<i class="fas fa-circle"></i>
+						</div>
+						<div class="game-content">
+							<h3>Brick Breaker</h3>
+							<p>Break all the bricks!</p>
+							<div class="game-stats">
+								<span class="stat">
+									<i class="fas fa-bolt"></i>
+									Arcade
+								</span>
+								<span class="stat">
+									<i class="fas fa-trophy"></i>
+									Challenging
+								</span>
+							</div>
+						</div>
+						<div class="play-button">
+							<i class="fas fa-play"></i>
+						</div>
+					</div>
 					</div>
 
 					<div class="games-footer"></div>
@@ -705,7 +759,73 @@
 			</div>
 		</div>
 
+		<!-- 2048 Game Modal -->
+		<div id="game2048Modal" class="game-modal">
+			<div class="game-modal-content">
+				<div class="game-header">
+					<h3>2048 Game 📊</h3>
+					<div class="game-controls">
+						<div class="score-display">
+							<span>Score: <span id="score2048">0</span> | Best: <span id="best2048">0</span></span>
+						</div>
+						<button class="game-btn" onclick="close2048Game()">
+							<i class="fas fa-times"></i>
+						</button>
+					</div>
+				</div>
+				<div class="game-area game2048-container">
+					<div id="game2048Area"></div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Tic Tac Toe Game Modal -->
+		<div id="tictactoeModal" class="game-modal">
+			<div class="game-modal-content">
+				<div class="game-header">
+					<h3>Tic Tac Toe ⭕</h3>
+					<div class="game-controls">
+						<div class="score-display">
+							<span>You: <span id="playerScore">0</span> | AI: <span id="aiScore">0</span></span>
+						</div>
+						<button class="game-btn" onclick="closeTicTacToeGame()">
+							<i class="fas fa-times"></i>
+						</button>
+					</div>
+				</div>
+				<div class="game-area ttt-container">
+					<div id="ticTacToeArea"></div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Brick Breaker Game Modal -->
+		<div id="breakoutModal" class="game-modal">
+			<div class="game-modal-content">
+				<div class="game-header">
+					<h3>Brick Breaker 🎯</h3>
+					<div class="game-controls">
+						<div class="score-display">
+							<span>Score: <span id="breakoutScore">0</span> | Lives: <span id="breakoutLives">3</span></span>
+						</div>
+						<button class="game-btn" onclick="closeBreakoutGame()">
+							<i class="fas fa-times"></i>
+						</button>
+					</div>
+				</div>
+				<div class="game-area breakout-container">
+					<canvas id="breakoutCanvas"></canvas>
+				</div>
+				<p style="text-align: center; color: #666; margin-top: 1rem; font-size: 0.9rem;">
+					Use arrow keys or mouse to move paddle
+				</p>
+			</div>
+		</div>
+
 		<!-- Scripts -->
 		<script src="script.js"></script>
+		<script src="games/2048/game2048.js"></script>
+		<script src="games/tic-tac-toe/tictactoe.js"></script>
+		<script src="games/brick-breaker/breakout.js"></script>
 	</body>
 </html>
