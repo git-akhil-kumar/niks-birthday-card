@@ -1,0 +1,18 @@
+name: Protect Master Branch
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  block-direct-push:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    steps:
+      - name: Check if push is from PR
+        run: |
+          echo "❌ Direct pushes to master are not allowed!"
+          echo "Please create a pull request from a feature branch instead."
+          exit 1
+
