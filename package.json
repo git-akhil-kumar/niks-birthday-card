@@ -6,8 +6,11 @@
   "scripts": {
     "start": "python3 -m http.server 8000",
     "dev": "python3 -m http.server 8000",
-    "build": "echo 'No build step required for static site'",
-    "deploy": "echo 'Deploy via GitHub Actions'"
+    "build": "./build.sh",
+    "build:prod": "NODE_ENV=production ./build.sh",
+    "deploy": "echo 'Deploy via GitHub Actions or Netlify CLI'",
+    "security:audit": "echo 'Run security audit: npm audit'",
+    "test": "echo 'No tests configured'"
   },
   "keywords": [
     "birthday",
