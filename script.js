@@ -1290,10 +1290,12 @@ function openGame(gameType) {
 		openSnakeGame();
 	} else if (gameType === "game2048") {
 		open2048Game();
-	} else if (gameType === "tictactoe") {
-		openTicTacToeGame();
 	} else if (gameType === "breakout") {
 		openBreakoutGame();
+    } else if (gameType === "runner") {
+        openRunnerGame();
+    } else if (gameType === "flappy") {
+        openFlappyGame();
 	} else {
 		showComingSoonNotification();
 	}
@@ -1347,22 +1349,7 @@ function close2048Game() {
 	}
 }
 
-function openTicTacToeGame() {
-	const modal = document.getElementById('tictactoeModal');
-	if (modal) {
-		modal.classList.add('active');
-		history.pushState({ section: 'games', game: 'tictactoe' }, '', '#games');
-		setTimeout(() => initTicTacToe(), 100);
-	}
-}
-
-function closeTicTacToeGame() {
-	const modal = document.getElementById('tictactoeModal');
-	if (modal) {
-		modal.classList.remove('active');
-		history.pushState({ section: 'games' }, '', '#games');
-	}
-}
+// Tic Tac Toe removed
 
 function openBreakoutGame() {
 	const modal = document.getElementById('breakoutModal');
@@ -1379,8 +1366,63 @@ function closeBreakoutGame() {
 		modal.classList.remove('active');
 		breakout.gameRunning = false;
 		if (breakout.gameInterval) cancelAnimationFrame(breakout.gameInterval);
+        if (typeof cleanupBreakoutControls === 'function') {
+            cleanupBreakoutControls();
+        }
 		history.pushState({ section: 'games' }, '', '#games');
 	}
+}
+
+function openRunnerGame() {
+    const modal = document.getElementById('runnerModal');
+    if (modal) {
+        modal.classList.add('active');
+        history.pushState({ section: 'games', game: 'runner' }, '', '#games');
+        setTimeout(() => initRunner(), 100);
+    }
+}
+
+function closeRunnerGame() {
+    const modal = document.getElementById('runnerModal');
+    if (modal) {
+        modal.classList.remove('active');
+        if (typeof runner !== 'undefined') {
+            runner.running = false;
+            if (runner.rafId) cancelAnimationFrame(runner.rafId);
+        }
+        if (typeof cleanupRunnerControls === 'function') {
+            cleanupRunnerControls();
+        }
+        const overlay = document.querySelector('.runner-overlay');
+        if (overlay) overlay.remove();
+        history.pushState({ section: 'games' }, '', '#games');
+    }
+}
+
+function openFlappyGame() {
+    const modal = document.getElementById('flappyModal');
+    if (modal) {
+        modal.classList.add('active');
+        history.pushState({ section: 'games', game: 'flappy' }, '', '#games');
+        setTimeout(() => initFlappy(), 100);
+    }
+}
+
+function closeFlappyGame() {
+    const modal = document.getElementById('flappyModal');
+    if (modal) {
+        modal.classList.remove('active');
+        if (typeof flappy !== 'undefined') {
+            flappy.running = false;
+            if (flappy.rafId) cancelAnimationFrame(flappy.rafId);
+        }
+        if (typeof cleanupFlappyControls === 'function') {
+            cleanupFlappyControls();
+        }
+        const overlay = document.querySelector('.flappy-overlay');
+        if (overlay) overlay.remove();
+        history.pushState({ section: 'games' }, '', '#games');
+    }
 }
 
 // Snake Game Functions

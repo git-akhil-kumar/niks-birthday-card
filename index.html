@@ -16,8 +16,9 @@
 		/>
 		<!-- Game Styles -->
 		<link rel="stylesheet" href="games/2048/game2048.css">
-		<link rel="stylesheet" href="games/tic-tac-toe/tictactoe.css">
 		<link rel="stylesheet" href="games/brick-breaker/breakout.css">
+		<link rel="stylesheet" href="games/endless-runner/runner.css">
+		<link rel="stylesheet" href="games/flappy/flappy.css">
 	</head>
 	<body>
 		<!-- Background Elements -->
@@ -602,28 +603,6 @@
 						</div>
 					</div>
 
-					<div class="game-card" data-game="tictactoe" onclick="openGame('tictactoe')">
-						<div class="game-icon">
-							<i class="fas fa-times"></i>
-						</div>
-						<div class="game-content">
-							<h3>Tic Tac Toe</h3>
-							<p>Play against smart AI</p>
-							<div class="game-stats">
-								<span class="stat">
-									<i class="fas fa-robot"></i>
-									AI Opponent
-								</span>
-								<span class="stat">
-									<i class="fas fa-chess"></i>
-									Classic
-								</span>
-							</div>
-						</div>
-						<div class="play-button">
-							<i class="fas fa-play"></i>
-						</div>
-					</div>
 
 					<div class="game-card" data-game="breakout" onclick="openGame('breakout')">
 						<div class="game-icon">
@@ -640,6 +619,52 @@
 								<span class="stat">
 									<i class="fas fa-trophy"></i>
 									Challenging
+								</span>
+							</div>
+						</div>
+						<div class="play-button">
+							<i class="fas fa-play"></i>
+						</div>
+					</div>
+
+					<div class="game-card" data-game="runner" onclick="openGame('runner')">
+						<div class="game-icon">
+							<i class="fas fa-running"></i>
+						</div>
+						<div class="game-content">
+							<h3>Endless Runner</h3>
+							<p>Jump/slide to dodge obstacles</p>
+							<div class="game-stats">
+								<span class="stat">
+									<i class="fas fa-mobile-alt"></i>
+									Mobile Swipe
+								</span>
+								<span class="stat">
+									<i class="fas fa-tachometer-alt"></i>
+									Smooth
+								</span>
+							</div>
+						</div>
+						<div class="play-button">
+							<i class="fas fa-play"></i>
+						</div>
+					</div>
+
+					<div class="game-card" data-game="flappy" onclick="openGame('flappy')">
+						<div class="game-icon">
+							<i class="fas fa-feather-alt"></i>
+						</div>
+						<div class="game-content">
+							<h3>Flappy Fun</h3>
+							<p>Tap or press to flap!</p>
+							<div class="game-stats">
+								<span class="stat">
+									<i class="fas fa-mobile-alt"></i>
+									Mobile Tap
+								</span>
+								<span class="stat">
+									<i class="fas fa-wave-square"></i>
+									Arcade
 								</span>
 							</div>
 						</div>
@@ -768,6 +793,9 @@
 						<div class="score-display">
 							<span>Score: <span id="score2048">0</span> | Best: <span id="best2048">0</span></span>
 						</div>
+                        <button class="game-btn" onclick="undo2048()" title="Undo last move">
+                            <i class="fas fa-undo"></i>
+                        </button>
 						<button class="game-btn" onclick="close2048Game()">
 							<i class="fas fa-times"></i>
 						</button>
@@ -779,25 +807,6 @@
 			</div>
 		</div>
 
-		<!-- Tic Tac Toe Game Modal -->
-		<div id="tictactoeModal" class="game-modal">
-			<div class="game-modal-content">
-				<div class="game-header">
-					<h3>Tic Tac Toe ⭕</h3>
-					<div class="game-controls">
-						<div class="score-display">
-							<span>You: <span id="playerScore">0</span> | AI: <span id="aiScore">0</span></span>
-						</div>
-						<button class="game-btn" onclick="closeTicTacToeGame()">
-							<i class="fas fa-times"></i>
-						</button>
-					</div>
-				</div>
-				<div class="game-area ttt-container">
-					<div id="ticTacToeArea"></div>
-				</div>
-			</div>
-		</div>
 
 		<!-- Brick Breaker Game Modal -->
 		<div id="breakoutModal" class="game-modal">
@@ -822,10 +831,57 @@
 			</div>
 		</div>
 
+		<!-- Endless Runner Game Modal -->
+		<div id="runnerModal" class="game-modal">
+			<div class="game-modal-content">
+				<div class="game-header">
+					<h3>Endless Runner 🏃</h3>
+					<div class="game-controls">
+						<div class="score-display">
+							<span>Score: <span id="runnerScore">0</span> | Best: <span id="runnerBest">0</span></span>
+						</div>
+						<button class="game-btn" onclick="closeRunnerGame()">
+							<i class="fas fa-times"></i>
+						</button>
+					</div>
+				</div>
+				<div class="game-area runner-container">
+					<canvas id="runnerCanvas"></canvas>
+				</div>
+				<p style="text-align: center; color: #666; margin-top: 1rem; font-size: 0.9rem;">
+					Swipe up/down (or Arrow keys) to jump/slide
+				</p>
+			</div>
+		</div>
+
+		<!-- Flappy Game Modal -->
+		<div id="flappyModal" class="game-modal">
+			<div class="game-modal-content">
+				<div class="game-header">
+					<h3>Flappy Fun 🐤</h3>
+					<div class="game-controls">
+						<div class="score-display">
+							<span>Score: <span id="flappyScore">0</span> | Best: <span id="flappyBest">0</span></span>
+						</div>
+						<button class="game-btn" onclick="closeFlappyGame()">
+							<i class="fas fa-times"></i>
+						</button>
+					</div>
+				</div>
+				<div class="game-area flappy-container">
+					<canvas id="flappyCanvas"></canvas>
+				</div>
+				<p style="text-align: center; color: #666; margin-top: 1rem; font-size: 0.9rem;">
+					Tap / Space / ArrowUp to flap and pass through pipes
+				</p>
+			</div>
+		</div>
+
 		<!-- Scripts -->
 		<script src="script.js"></script>
 		<script src="games/2048/game2048.js"></script>
-		<script src="games/tic-tac-toe/tictactoe.js"></script>
 		<script src="games/brick-breaker/breakout.js"></script>
+		<script src="games/endless-runner/runner.js"></script>
+		<script src="games/flappy/flappy.js"></script>
 	</body>
 </html>

@@ -11,7 +11,9 @@ let breakout = {
     score: 0,
     lives: 3,
     gameRunning: false,
-    gameInterval: null
+    gameInterval: null,
+    keyHandler: null,
+    mouseHandler: null
 };
 
 function initBreakout() {
@@ -21,6 +23,8 @@ function initBreakout() {
     
     breakout.canvas = document.getElementById('breakoutCanvas');
     if (!breakout.canvas) return;
+    const existingOverlay = document.querySelector('.game-over-breakout');
+    if (existingOverlay) existingOverlay.remove();
     
     breakout.ctx = breakout.canvas.getContext('2d');
     breakout.canvas.width = 800;
@@ -62,31 +66,50 @@ function initBreakoutBricks() {
 }
 
 function setupBreakoutControls() {
-    document.addEventListener('keydown', (e) => {
+    // Store handlers so we can clean them up on close
+    breakout.keyHandler = (e) => {
         if (e.key === 'ArrowLeft') {
             breakout.paddleX = Math.max(0, breakout.paddleX - 20);
         } else if (e.key === 'ArrowRight') {
             breakout.paddleX = Math.min(breakout.canvas.width - 120, breakout.paddleX + 20);
         }
-    });
-    
-    breakout.canvas.addEventListener('mousemove', (e) => {
+    };
+    document.addEventListener('keydown', breakout.keyHandler);
+
+    breakout.mouseHandler = (e) => {
         const rect = breakout.canvas.getBoundingClientRect();
         breakout.paddleX = e.clientX - rect.left - 60;
         breakout.paddleX = Math.max(0, Math.min(breakout.canvas.width - 120, breakout.paddleX));
-    });
+    };
+    breakout.canvas.addEventListener('mousemove', breakout.mouseHandler);
+}
+
+function cleanupBreakoutControls() {
+    if (breakout.keyHandler) {
+        document.removeEventListener('keydown', breakout.keyHandler);
+        breakout.keyHandler = null;
+    }
+    if (breakout.canvas && breakout.mouseHandler) {
+        breakout.canvas.removeEventListener('mousemove', breakout.mouseHandler);
+        breakout.mouseHandler = null;
+    }
 }
 
 function breakoutGameLoop() {
     if (!breakout.gameRunning) return;
-    
-    clearBreakoutCanvas();
-    drawBreakoutBricks();
-    drawBreakoutPaddle();
-    moveBreakoutBall();
-    drawBreakoutBall();
-    
-    breakout.gameInterval = requestAnimationFrame(breakoutGameLoop);
+    try {
+        clearBreakoutCanvas();
+        drawBreakoutBricks();
+        drawBreakoutPaddle();
+        moveBreakoutBall();
+        drawBreakoutBall();
+        breakout.gameInterval = requestAnimationFrame(breakoutGameLoop);
+    } catch (err) {
+        console.error('Breakout error:', err);
+        breakout.gameRunning = false;
+        if (breakout.gameInterval) cancelAnimationFrame(breakout.gameInterval);
+        showBreakoutError(err);
+    }
 }
 
 function clearBreakoutCanvas() {
@@ -217,6 +240,19 @@ function showBreakoutGameOver() {
     document.querySelector('.breakout-container').appendChild(overlay);
 }
 
+function showBreakoutError(err) {
+    const overlay = document.createElement('div');
+    overlay.className = 'game-over-breakout';
+    overlay.innerHTML = `
+        <div class="game-over-content">
+            <h2>Oops! Crash</h2>
+            <p>${(err && err.message) ? err.message : 'Unexpected error'}</p>
+            <button class="play-again-btn" onclick="restartBreakout()">Restart</button>
+        </div>
+    `;
+    document.querySelector('.breakout-container').appendChild(overlay);
+}
+
 function restartBreakout() {
     if (breakout.gameInterval) {
         cancelAnimationFrame(breakout.gameInterval);
@@ -228,4 +264,5 @@ function restartBreakout() {
 
 window.initBreakout = initBreakout;
 window.restartBreakout = restartBreakout;
+window.cleanupBreakoutControls = cleanupBreakoutControls;
 

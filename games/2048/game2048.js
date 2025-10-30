@@ -4,13 +4,26 @@ let game2048 = {
     score: 0,
     bestScore: 0,
     gameOver: false,
-    size: 4
+    size: 4,
+    inputLocked: false,
+    touchStartX: 0,
+    touchStartY: 0,
+    mergedCells: new Set(),
+    newCell: null,
+    prevGrid: null,
+    prevScore: 0,
+    canUndo: false
 };
 
 function init2048() {
     game2048.score = 0;
     game2048.gameOver = false;
     game2048.grid = Array(game2048.size).fill(null).map(() => Array(game2048.size).fill(0));
+    game2048.mergedCells = new Set();
+    game2048.newCell = null;
+    game2048.prevGrid = null;
+    game2048.prevScore = 0;
+    game2048.canUndo = false;
     
     loadBestScore();
     addRandomTile();
@@ -42,6 +55,7 @@ function addRandomTile() {
     
     const randomCell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
     game2048.grid[randomCell.row][randomCell.col] = Math.random() < 0.9 ? 2 : 4;
+    game2048.newCell = { row: randomCell.row, col: randomCell.col };
     return true;
 }
 
@@ -60,6 +74,12 @@ function render2048() {
             if (value !== 0) {
                 tile.textContent = value;
                 tile.className += ` tile-${value}`;
+                const key = `${i}-${j}`;
+                if (game2048.mergedCells.has(key)) {
+                    tile.className += ' tile-merged';
+                } else if (game2048.newCell && game2048.newCell.row === i && game2048.newCell.col === j) {
+                    tile.className += ' tile-new';
+                }
             }
             
             container.appendChild(tile);
@@ -77,6 +97,13 @@ function update2048Score() {
 
 function move2048(direction) {
     if (game2048.gameOver) return;
+    if (game2048.inputLocked) return;
+    game2048.inputLocked = true;
+    game2048.mergedCells = new Set();
+    game2048.newCell = null;
+    // Save state for undo
+    game2048.prevGrid = game2048.grid.map(row => [...row]);
+    game2048.prevScore = game2048.score;
     
     let moved = false;
     const oldGrid = game2048.grid.map(row => [...row]);
@@ -100,12 +127,29 @@ function move2048(direction) {
         addRandomTile();
         render2048();
         update2048Score();
+        game2048.canUndo = true;
         
         if (checkGameOver2048()) {
             game2048.gameOver = true;
             show2048GameOver();
         }
     }
+    // Small throttle to avoid multiple moves from one gesture
+    setTimeout(() => { game2048.inputLocked = false; }, 80);
+}
+
+function undo2048() {
+    const modal = document.getElementById('game2048Modal');
+    if (!modal || !modal.classList.contains('active')) return;
+    if (!game2048.canUndo || !game2048.prevGrid) return;
+    game2048.grid = game2048.prevGrid.map(row => [...row]);
+    game2048.score = game2048.prevScore;
+    game2048.mergedCells = new Set();
+    game2048.newCell = null;
+    game2048.gameOver = false;
+    game2048.canUndo = false;
+    render2048();
+    update2048Score();
 }
 
 function moveLeft2048() {
@@ -113,21 +157,25 @@ function moveLeft2048() {
     for (let i = 0; i < game2048.size; i++) {
         const row = game2048.grid[i].filter(val => val !== 0);
         const newRow = [];
+        const mergeFlags = [];
         let j = 0;
         
         while (j < row.length) {
             if (j < row.length - 1 && row[j] === row[j + 1]) {
                 newRow.push(row[j] * 2);
+                mergeFlags.push(true);
                 game2048.score += row[j] * 2;
                 j += 2;
             } else {
                 newRow.push(row[j]);
+                mergeFlags.push(false);
                 j++;
             }
         }
         
         while (newRow.length < game2048.size) {
             newRow.push(0);
+            mergeFlags.push(false);
         }
         
         if (JSON.stringify(newRow) !== JSON.stringify(game2048.grid[i])) {
@@ -135,6 +183,10 @@ function moveLeft2048() {
         }
         
         game2048.grid[i] = newRow;
+        // Record merged positions
+        for (let c = 0; c < mergeFlags.length; c++) {
+            if (mergeFlags[c]) game2048.mergedCells.add(`${i}-${c}`);
+        }
     }
     return moved;
 }
@@ -146,30 +198,38 @@ function moveRight2048() {
         row = row.filter(val => val !== 0);
         row.reverse();
         const newRow = [];
+        const mergeFlags = [];
         let j = 0;
         
         while (j < row.length) {
             if (j < row.length - 1 && row[j] === row[j + 1]) {
                 newRow.push(row[j] * 2);
+                mergeFlags.push(true);
                 game2048.score += row[j] * 2;
                 j += 2;
             } else {
                 newRow.push(row[j]);
+                mergeFlags.push(false);
                 j++;
             }
         }
         
         while (newRow.length < game2048.size) {
             newRow.push(0);
+            mergeFlags.push(false);
         }
         
         newRow.reverse();
+        mergeFlags.reverse();
         
         if (JSON.stringify(newRow) !== JSON.stringify(game2048.grid[i])) {
             moved = true;
         }
         
         game2048.grid[i] = newRow;
+        for (let c = 0; c < mergeFlags.length; c++) {
+            if (mergeFlags[c]) game2048.mergedCells.add(`${i}-${c}`);
+        }
     }
     return moved;
 }
@@ -183,25 +243,30 @@ function moveUp2048() {
         }
         
         const newCol = [];
+        const mergeFlags = [];
         let i = 0;
         while (i < col.length) {
             if (i < col.length - 1 && col[i] === col[i + 1]) {
                 newCol.push(col[i] * 2);
+                mergeFlags.push(true);
                 game2048.score += col[i] * 2;
                 i += 2;
             } else {
                 newCol.push(col[i]);
+                mergeFlags.push(false);
                 i++;
             }
         }
         
         while (newCol.length < game2048.size) {
             newCol.push(0);
+            mergeFlags.push(false);
         }
         
         for (let i = 0; i < game2048.size; i++) {
             if (game2048.grid[i][j] !== newCol[i]) moved = true;
             game2048.grid[i][j] = newCol[i];
+            if (mergeFlags[i]) game2048.mergedCells.add(`${i}-${j}`);
         }
     }
     return moved;
@@ -217,27 +282,33 @@ function moveDown2048() {
         col.reverse();
         
         const newCol = [];
+        const mergeFlags = [];
         let i = 0;
         while (i < col.length) {
             if (i < col.length - 1 && col[i] === col[i + 1]) {
                 newCol.push(col[i] * 2);
+                mergeFlags.push(true);
                 game2048.score += col[i] * 2;
                 i += 2;
             } else {
                 newCol.push(col[i]);
+                mergeFlags.push(false);
                 i++;
             }
         }
         
         while (newCol.length < game2048.size) {
             newCol.push(0);
+            mergeFlags.push(false);
         }
         
         newCol.reverse();
+        mergeFlags.reverse();
         
         for (let i = 0; i < game2048.size; i++) {
             if (game2048.grid[i][j] !== newCol[i]) moved = true;
             game2048.grid[i][j] = newCol[i];
+            if (mergeFlags[i]) game2048.mergedCells.add(`${i}-${j}`);
         }
     }
     return moved;
@@ -275,6 +346,8 @@ function show2048GameOver() {
 }
 
 function handle2048KeyPress(e) {
+    const modal = document.getElementById('game2048Modal');
+    if (!modal || !modal.classList.contains('active')) return;
     switch(e.key) {
         case 'ArrowUp':
             move2048('up');
@@ -293,11 +366,41 @@ function handle2048KeyPress(e) {
 
 // Setup keyboard controls
 document.addEventListener('DOMContentLoaded', () => {
-    const modal = document.getElementById('game2048Modal');
-    if (modal) {
-        modal.addEventListener('keydown', handle2048KeyPress);
+    // Listen on document so arrows work without focusing the modal
+    document.addEventListener('keydown', handle2048KeyPress);
+
+    // Touch controls (swipe)
+    const area = document.getElementById('game2048Area');
+    if (area) {
+        area.addEventListener('touchstart', (e) => {
+            const modal = document.getElementById('game2048Modal');
+            if (!modal || !modal.classList.contains('active')) return;
+            if (!e.touches || e.touches.length === 0) return;
+            game2048.touchStartX = e.touches[0].clientX;
+            game2048.touchStartY = e.touches[0].clientY;
+            e.preventDefault();
+        }, { passive: false });
+
+        area.addEventListener('touchend', (e) => {
+            const modal = document.getElementById('game2048Modal');
+            if (!modal || !modal.classList.contains('active')) return;
+            if (!e.changedTouches || e.changedTouches.length === 0) return;
+            const dx = e.changedTouches[0].clientX - game2048.touchStartX;
+            const dy = e.changedTouches[0].clientY - game2048.touchStartY;
+            const absDx = Math.abs(dx);
+            const absDy = Math.abs(dy);
+            const minSwipe = 20;
+            if (absDx < minSwipe && absDy < minSwipe) return;
+            if (absDx > absDy) {
+                move2048(dx > 0 ? 'right' : 'left');
+            } else {
+                move2048(dy > 0 ? 'down' : 'up');
+            }
+            e.preventDefault();
+        }, { passive: false });
     }
 });
 
 window.init2048 = init2048;
+window.undo2048 = undo2048;
 
