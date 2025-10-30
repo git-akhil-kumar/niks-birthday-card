@@ -331,6 +331,8 @@ function showSection(sectionId) {
 				animateTimelineItems();
 			} else if (sectionId === "wishes") {
 				animateWishCards();
+					} else if (sectionId === "dates") {
+						animateDatesSection();
 			} else if (sectionId === "games") {
 				animateGameCards();
 			} else if (sectionId === "madeby") {
@@ -691,6 +693,19 @@ function animateGameCards() {
 	gameCards.forEach((card, index) => {
 		card.style.animation = `slideInUp 0.6s ease ${index * 0.2}s both`;
 	});
+}
+
+function animateDatesSection() {
+    const dateCards = document.querySelectorAll('.date-card');
+    dateCards.forEach((card, index) => {
+        card.style.animation = `slideInUp 0.5s ease ${index * 0.1}s both`;
+        card.addEventListener('mouseenter', () => {
+            card.style.transform = 'translateY(-4px)';
+        });
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = 'translateY(0)';
+        });
+    });
 }
 
 function animateTimelineItems() {
