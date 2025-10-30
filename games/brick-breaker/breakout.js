@@ -13,7 +13,11 @@ let breakout = {
     gameRunning: false,
     gameInterval: null,
     keyHandler: null,
-    mouseHandler: null
+    keyUpHandler: null,
+    mouseHandler: null,
+    keyLeft: false,
+    keyRight: false,
+    paddleSpeed: 10
 };
 
 function initBreakout() {
@@ -68,13 +72,17 @@ function initBreakoutBricks() {
 function setupBreakoutControls() {
     // Store handlers so we can clean them up on close
     breakout.keyHandler = (e) => {
-        if (e.key === 'ArrowLeft') {
-            breakout.paddleX = Math.max(0, breakout.paddleX - 20);
-        } else if (e.key === 'ArrowRight') {
-            breakout.paddleX = Math.min(breakout.canvas.width - 120, breakout.paddleX + 20);
-        }
+        const modal = document.getElementById('breakoutModal');
+        if (!modal || !modal.classList.contains('active')) return;
+        if (e.key === 'ArrowLeft') { breakout.keyLeft = true; e.preventDefault(); }
+        if (e.key === 'ArrowRight') { breakout.keyRight = true; e.preventDefault(); }
     };
     document.addEventListener('keydown', breakout.keyHandler);
+    breakout.keyUpHandler = (e) => {
+        if (e.key === 'ArrowLeft') breakout.keyLeft = false;
+        if (e.key === 'ArrowRight') breakout.keyRight = false;
+    };
+    document.addEventListener('keyup', breakout.keyUpHandler);
 
     breakout.mouseHandler = (e) => {
         const rect = breakout.canvas.getBoundingClientRect();
@@ -89,6 +97,10 @@ function cleanupBreakoutControls() {
         document.removeEventListener('keydown', breakout.keyHandler);
         breakout.keyHandler = null;
     }
+    if (breakout.keyUpHandler) {
+        document.removeEventListener('keyup', breakout.keyUpHandler);
+        breakout.keyUpHandler = null;
+    }
     if (breakout.canvas && breakout.mouseHandler) {
         breakout.canvas.removeEventListener('mousemove', breakout.mouseHandler);
         breakout.mouseHandler = null;
@@ -99,6 +111,7 @@ function breakoutGameLoop() {
     if (!breakout.gameRunning) return;
     try {
         clearBreakoutCanvas();
+        updateBreakoutPaddle();
         drawBreakoutBricks();
         drawBreakoutPaddle();
         moveBreakoutBall();
@@ -109,6 +122,15 @@ function breakoutGameLoop() {
         breakout.gameRunning = false;
         if (breakout.gameInterval) cancelAnimationFrame(breakout.gameInterval);
         showBreakoutError(err);
+    }
+}
+
+function updateBreakoutPaddle() {
+    if (breakout.keyLeft) {
+        breakout.paddleX = Math.max(0, breakout.paddleX - breakout.paddleSpeed);
+    }
+    if (breakout.keyRight) {
+        breakout.paddleX = Math.min(breakout.canvas.width - 120, breakout.paddleX + breakout.paddleSpeed);
     }
 }
 
