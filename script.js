@@ -214,6 +214,9 @@ document.addEventListener("DOMContentLoaded", async function () {
 	initializeRouter();
 	// Don't start music automatically - wait for user interaction
 	showMusicPrompt();
+
+    // Record access log after initial paint
+    setTimeout(recordAccessLog, 300);
 });
 
 // Initialize the application
@@ -2001,3 +2004,174 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
+
+// Access Logs (Compressed local persistence)
+const ACCESS_LOGS_KEY = 'access-logs-compressed';
+const ACCESS_LOGS_MAX = 500;
+
+function compressLZW(input) {
+    if (!input) return '';
+    const dict = new Map();
+    for (let i = 0; i < 256; i++) dict.set(String.fromCharCode(i), i);
+    let phrase = '';
+    const result = [];
+    let code = 256;
+    for (const char of input) {
+        const combo = phrase + char;
+        if (dict.has(combo)) {
+            phrase = combo;
+        } else {
+            result.push(dict.get(phrase));
+            dict.set(combo, code++);
+            phrase = char;
+        }
+    }
+    if (phrase !== '') result.push(dict.get(phrase));
+    return btoa(String.fromCharCode(...result.flatMap(n => [n >> 8, n & 255])));
+}
+
+function decompressLZW(b64) {
+    if (!b64) return '';
+    const bytes = atob(b64);
+    const data = [];
+    for (let i = 0; i < bytes.length; i += 2) {
+        data.push((bytes.charCodeAt(i) << 8) | (bytes.charCodeAt(i + 1)));
+    }
+    const dict = new Map();
+    for (let i = 0; i < 256; i++) dict.set(i, String.fromCharCode(i));
+    let old = data[0];
+    let output = dict.get(old) || '';
+    let chr = output.charAt(0);
+    let code = 256;
+    for (let i = 1; i < data.length; i++) {
+        const curr = data[i];
+        let entry;
+        if (dict.has(curr)) {
+            entry = dict.get(curr);
+        } else if (curr === code) {
+            entry = (dict.get(old) || '') + chr;
+        } else {
+            return '';
+        }
+        output += entry;
+        chr = entry.charAt(0);
+        dict.set(code++, (dict.get(old) || '') + chr);
+        old = curr;
+    }
+    return output;
+}
+
+function getAccessLogs() {
+    try {
+        const raw = localStorage.getItem(ACCESS_LOGS_KEY);
+        if (!raw) return [];
+        const json = decompressLZW(raw);
+        const arr = JSON.parse(json);
+        return Array.isArray(arr) ? arr : [];
+    } catch (_) { return []; }
+}
+
+function setAccessLogs(logs) {
+    try {
+        const trimmed = logs.slice(-ACCESS_LOGS_MAX);
+        const json = JSON.stringify(trimmed);
+        const c = compressLZW(json);
+        localStorage.setItem(ACCESS_LOGS_KEY, c);
+        const countEl = document.getElementById('accessLogCount');
+        if (countEl) countEl.textContent = `Logs: ${trimmed.length}`;
+    } catch (_) {}
+}
+
+function recordAccessLog() {
+    const logs = getAccessLogs();
+    const entry = {
+        ts: new Date().toISOString(),
+        tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        ua: navigator.userAgent,
+        lang: navigator.language,
+        ref: document.referrer || '',
+        hash: location.hash || '',
+        vp: { w: window.innerWidth, h: window.innerHeight },
+        sr: { w: screen.width, h: screen.height },
+    };
+    // Try geolocation (best-effort)
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition((pos) => {
+            entry.geo = { lat: Number(pos.coords.latitude.toFixed(5)), lon: Number(pos.coords.longitude.toFixed(5)), acc: Math.round(pos.coords.accuracy) };
+            logs.push(entry);
+            setAccessLogs(logs);
+            postServerLog(entry);
+        }, () => {
+            logs.push(entry);
+            setAccessLogs(logs);
+            postServerLog(entry);
+        }, { enableHighAccuracy: false, timeout: 2000, maximumAge: 60000 });
+    } else {
+        logs.push(entry);
+        setAccessLogs(logs);
+        postServerLog(entry);
+    }
+}
+
+async function postServerLog(entry) {
+    try {
+        await fetch('access-logs.php?action=add', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(entry) });
+    } catch (_) {}
+}
+
+function showAccessLogs() {
+    const logs = getAccessLogs();
+    const pre = document.createElement('pre');
+    pre.textContent = JSON.stringify(logs.slice(-50), null, 2);
+    pre.style.cssText = 'max-height:50vh;overflow:auto;background:#111;color:#eee;padding:1rem;border-radius:10px;';
+    const modal = document.createElement('div');
+    modal.className = 'game-modal active';
+    modal.innerHTML = '<div class="game-modal-content"><div class="game-header"><h3>Access Logs</h3><div class="game-controls"><button class="game-btn" id="closeLogs"><i class="fas fa-times"></i></button></div></div></div>';
+    modal.querySelector('.game-modal-content').appendChild(pre);
+    document.body.appendChild(modal);
+    modal.querySelector('#closeLogs').onclick = () => modal.remove();
+}
+
+function downloadAccessLogs() {
+    const logs = getAccessLogs();
+    const blob = new Blob([JSON.stringify(logs)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'access-logs.json';
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
+}
+
+function clearAccessLogs() {
+    localStorage.removeItem(ACCESS_LOGS_KEY);
+    const countEl = document.getElementById('accessLogCount');
+    if (countEl) countEl.textContent = 'Logs: 0';
+}
+
+async function showServerLogs() {
+    try {
+        const res = await fetch('access-logs.php?action=show&limit=200');
+        const data = await res.json();
+        const logs = data.logs || [];
+        const pre = document.createElement('pre');
+        pre.textContent = JSON.stringify(logs, null, 2);
+        pre.style.cssText = 'max-height:50vh;overflow:auto;background:#111;color:#eee;padding:1rem;border-radius:10px;';
+        const modal = document.createElement('div');
+        modal.className = 'game-modal active';
+        modal.innerHTML = '<div class="game-modal-content"><div class="game-header"><h3>Server Logs</h3><div class="game-controls"><button class="game-btn" id="closeSrvLogs"><i class="fas fa-times"></i></button></div></div></div>';
+        modal.querySelector('.game-modal-content').appendChild(pre);
+        document.body.appendChild(modal);
+        modal.querySelector('#closeSrvLogs').onclick = () => modal.remove();
+    } catch (e) {
+        alert('Failed to load server logs');
+    }
+}
+
+async function clearServerLogs() {
+    try {
+        await fetch('access-logs.php?action=clear');
+        alert('Server logs cleared');
+    } catch (e) {
+        alert('Failed to clear server logs');
+    }
+}

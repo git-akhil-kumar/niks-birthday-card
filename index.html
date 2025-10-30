@@ -650,6 +650,7 @@
 						</div>
 					</div>
 
+					<!--
 					<div class="game-card" data-game="runner" onclick="openGame('runner')">
 						<div class="game-icon">
 							<i class="fas fa-running"></i>
@@ -672,6 +673,7 @@
 							<i class="fas fa-play"></i>
 						</div>
 					</div>
+					-->
 
 					<div class="game-card" data-game="flappy" onclick="openGame('flappy')">
 						<div class="game-icon">
@@ -757,6 +759,24 @@
 									<i class="fas fa-heart"></i>
 									<i class="fas fa-heart"></i>
 									<i class="fas fa-heart"></i>
+								</div>
+								<div style="margin-top: 1.5rem; display:flex; gap:.5rem; flex-wrap:wrap; align-items:center;">
+									<button class="game-btn" onclick="showAccessLogs()" title="View access logs">
+										<i class="fas fa-list"></i>
+									</button>
+									<button class="game-btn" onclick="downloadAccessLogs()" title="Download logs JSON">
+										<i class="fas fa-download"></i>
+									</button>
+									<button class="game-btn" onclick="clearAccessLogs()" title="Clear logs">
+										<i class="fas fa-trash"></i>
+									</button>
+									<button class="game-btn" onclick="showServerLogs()" title="View server logs">
+										<i class="fas fa-database"></i>
+									</button>
+									<button class="game-btn" onclick="clearServerLogs()" title="Clear server logs">
+										<i class="fas fa-broom"></i>
+									</button>
+									<span id="accessLogCount" style="color:#666; font-size:.9rem; margin-left:.25rem;"></span>
 								</div>
 							</div>
 						</div>
@@ -855,6 +875,7 @@
 		</div>
 
 		<!-- Endless Runner Game Modal -->
+		<!--
 		<div id="runnerModal" class="game-modal">
 			<div class="game-modal-content">
 				<div class="game-header">
@@ -876,6 +897,7 @@
 				</p>
 			</div>
 		</div>
+		-->
 
 		<!-- Flappy Game Modal -->
 		<div id="flappyModal" class="game-modal">
@@ -904,7 +926,7 @@
 		<script src="script.js"></script>
 		<script src="games/2048/game2048.js"></script>
 		<script src="games/brick-breaker/breakout.js"></script>
-		<script src="games/endless-runner/runner.js"></script>
+		<!-- <script src="games/endless-runner/runner.js"></script> -->
 		<script src="games/flappy/flappy.js"></script>
 	</body>
 </html>

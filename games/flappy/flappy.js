@@ -5,14 +5,14 @@ let flappy = {
     width: 400,
     height: 600,
     bird: { x: 80, y: 300, r: 12, vy: 0 },
-    gravity: 0.45,
-    flap: -7.5,
+    gravity: 0.42,
+    flap: -8.5,
     pipes: [],
-    pipeGap: 140,
+    pipeGap: 180,
     pipeWidth: 60,
     pipeTimer: 0,
-    pipeInterval: 1300,
-    speed: 2.8,
+    pipeInterval: 1500,
+    speed: 2.2,
     score: 0,
     best: 0,
     running: false,
@@ -34,9 +34,9 @@ function initFlappy() {
     flappy.bird.vy = 0;
     flappy.pipes = [];
     flappy.pipeTimer = 0;
-    flappy.pipeInterval = 1300;
-    flappy.pipeGap = 140;
-    flappy.speed = 2.8;
+    flappy.pipeInterval = 1500;
+    flappy.pipeGap = 180;
+    flappy.speed = 2.2;
     flappy.score = 0;
     loadFlappyBest();
     setupFlappyControls();
@@ -110,10 +110,10 @@ function updateFlappy(dt) {
     if (flappy.pipeTimer >= flappy.pipeInterval) {
         flappy.pipeTimer = 0;
         spawnPipe();
-        // Difficulty ramp
-        flappy.speed = Math.min(6, flappy.speed + 0.05);
-        flappy.pipeGap = Math.max(110, flappy.pipeGap - 1.2);
-        flappy.pipeInterval = Math.max(900, flappy.pipeInterval - 12);
+        // Gentle difficulty ramp
+        flappy.speed = Math.min(4.2, flappy.speed + 0.03);
+        flappy.pipeGap = Math.max(150, flappy.pipeGap - 0.5);
+        flappy.pipeInterval = Math.max(1100, flappy.pipeInterval - 6);
     }
     for (let p of flappy.pipes) {
         p.x -= flappy.speed;
