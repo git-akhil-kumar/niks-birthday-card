@@ -1,4 +1,9 @@
 // Endless Runner - Smooth Canvas Game
+function escapeHtml(text) {
+    const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+    return String(text).replace(/[&<>"']/g, m => map[m]);
+}
+
 let runner = {
     canvas: null,
     ctx: null,
@@ -364,13 +369,20 @@ function showRunnerErrorOverlay(err) {
     if (!container) return;
     const overlay = document.createElement('div');
     overlay.className = 'runner-overlay';
-    overlay.innerHTML = `
-        <div class="game-over-content">
-            <h2>Oops! Crash</h2>
-            <p>${(err && err.message) ? err.message : 'Unexpected error'}</p>
-            <button class="play-again-btn" onclick="restartRunner()">Restart</button>
-        </div>
-    `;
+    const content = document.createElement('div');
+    content.className = 'game-over-content';
+    const h2 = document.createElement('h2');
+    h2.textContent = 'Oops! Crash';
+    const p = document.createElement('p');
+    p.textContent = (err && err.message) ? escapeHtml(err.message) : 'Unexpected error';
+    const btn = document.createElement('button');
+    btn.className = 'play-again-btn';
+    btn.textContent = 'Restart';
+    btn.onclick = restartRunner;
+    content.appendChild(h2);
+    content.appendChild(p);
+    content.appendChild(btn);
+    overlay.appendChild(content);
     container.appendChild(overlay);
 }
 

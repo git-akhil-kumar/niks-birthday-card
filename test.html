@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Server Test</title>
+    <style>
+        body { font-family: Arial; padding: 20px; background: #f0f0f0; }
+        .status { background: #4CAF50; color: white; padding: 20px; border-radius: 10px; margin: 20px 0; }
+        .error { background: #f44336; color: white; padding: 20px; border-radius: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Server Test Page</h1>
+    <div class="status">
+        ✓ If you see this, the server is working!
+    </div>
+    <h2>Next Steps:</h2>
+    <ol>
+        <li><a href="/">Go to Main Page</a></li>
+        <li>Check browser console (F12) for errors</li>
+        <li>Try hard refresh: Cmd+Shift+R (Mac) or Ctrl+Shift+R (Windows)</li>
+    </ol>
+    <script>
+        console.log('Test page loaded successfully');
+        console.log('Main page should be at: http://localhost:8080/');
+    </script>
+</body>
+</html>

@@ -1,4 +1,9 @@
 // Brick Breaker Game
+function escapeHtml(text) {
+    const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+    return String(text).replace(/[&<>"']/g, m => map[m]);
+}
+
 let breakout = {
     canvas: null,
     ctx: null,
@@ -285,13 +290,20 @@ function showBreakoutGameOver() {
 function showBreakoutError(err) {
     const overlay = document.createElement('div');
     overlay.className = 'game-over-breakout';
-    overlay.innerHTML = `
-        <div class="game-over-content">
-            <h2>Oops! Crash</h2>
-            <p>${(err && err.message) ? err.message : 'Unexpected error'}</p>
-            <button class="play-again-btn" onclick="restartBreakout()">Restart</button>
-        </div>
-    `;
+    const content = document.createElement('div');
+    content.className = 'game-over-content';
+    const h2 = document.createElement('h2');
+    h2.textContent = 'Oops! Crash';
+    const p = document.createElement('p');
+    p.textContent = (err && err.message) ? escapeHtml(err.message) : 'Unexpected error';
+    const btn = document.createElement('button');
+    btn.className = 'play-again-btn';
+    btn.textContent = 'Restart';
+    btn.onclick = restartBreakout;
+    content.appendChild(h2);
+    content.appendChild(p);
+    content.appendChild(btn);
+    overlay.appendChild(content);
     document.querySelector('.breakout-container').appendChild(overlay);
 }
 

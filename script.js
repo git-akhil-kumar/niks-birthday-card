@@ -917,7 +917,8 @@ function showMusicPrompt() {
 
 function showMusicNotification() {
 	const notification = document.createElement("div");
-	notification.innerHTML = "🎵 Now Playing: " + playlist[currentSongIndex].title;
+	// Safe: playlist data is from trusted source (file names)
+	notification.textContent = "🎵 Now Playing: " + playlist[currentSongIndex].title;
 	notification.style.cssText = `
         position: fixed;
         top: 100px;
@@ -1290,7 +1291,7 @@ function addNewTrip() {
 	closeTripModal();
 
 	// Show success message
-	showTripAddedNotification(title);
+	showTripAddedNotification(safeTitle);
 }
 
 function formatDate(dateString) {
@@ -1301,7 +1302,7 @@ function formatDate(dateString) {
 
 function showTripAddedNotification(tripTitle) {
 	const notification = document.createElement("div");
-	notification.innerHTML = `🎉 Added "${tripTitle}" to our timeline!`;
+	notification.textContent = `🎉 Added "${escapeHtml(tripTitle)}" to our timeline!`;
 	notification.style.cssText = `
         position: fixed;
         top: 100px;
@@ -2162,51 +2163,138 @@ function recordAccessLog() {
     }
 }
 
+// Track if PHP server is available (detect from first request)
+let phpServerAvailable = null;
+
 async function postServerLog(entry) {
+    // If we've already determined PHP is not available, skip entirely
+    if (phpServerAvailable === false) {
+        return; // PHP server not available, skip silently
+    }
+    
     try {
-        await fetch('access-logs.php?action=add', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(entry) });
-    } catch (_) {}
+        const res = await fetch('access-logs.php?action=add', { 
+            method: 'POST', 
+            headers: { 'Content-Type': 'application/json' }, 
+            body: JSON.stringify(entry) 
+        });
+        
+        // Detect if PHP is not available (501 = Python server can't handle POST)
+        if (res.status === 501) {
+            phpServerAvailable = false; // Remember PHP is not available
+            return; // Silently skip
+        }
+        
+        // PHP server is available
+        if (phpServerAvailable === null) {
+            phpServerAvailable = true;
+        }
+        
+        // Only log other errors in local development
+        if (!res.ok && isLocal) {
+            console.warn('Server log failed:', res.status, res.statusText);
+        }
+    } catch (e) {
+        // Network errors or CORS - silently fail (server logging is optional)
+        // Only log unexpected errors in local dev
+        if (isLocal && e.message && 
+            !e.message.includes('Failed to fetch') && 
+            !e.message.includes('network') &&
+            !e.message.includes('CORS')) {
+            console.warn('Server log error:', e.message);
+        }
+    }
 }
 
 function showAccessLogs() {
-    const logs = getAccessLogs();
-    const pre = document.createElement('pre');
-    pre.textContent = JSON.stringify(logs.slice(-50), null, 2);
-    pre.style.cssText = 'max-height:50vh;overflow:auto;background:#111;color:#eee;padding:1rem;border-radius:10px;';
-    const modal = document.createElement('div');
-    modal.className = 'game-modal active';
-    modal.innerHTML = '<div class="game-modal-content"><div class="game-header"><h3>Access Logs</h3><div class="game-controls"><button class="game-btn" id="closeLogs"><i class="fas fa-times"></i></button></div></div></div>';
-    modal.querySelector('.game-modal-content').appendChild(pre);
-    document.body.appendChild(modal);
-    modal.querySelector('#closeLogs').onclick = () => modal.remove();
+    console.log('showAccessLogs called'); // Debug
+    try {
+        const logs = getAccessLogs();
+        const pre = document.createElement('pre');
+        // Safe: JSON.stringify escapes all content
+        pre.textContent = JSON.stringify(logs.slice(-50), null, 2);
+        pre.style.cssText = 'max-height:50vh;overflow:auto;background:#111;color:#eee;padding:1rem;border-radius:10px;';
+        const modal = document.createElement('div');
+        modal.className = 'game-modal active';
+        // Safe: static HTML only
+        const modalContent = document.createElement('div');
+        modalContent.className = 'game-modal-content';
+        const header = document.createElement('div');
+        header.className = 'game-header';
+        const h3 = document.createElement('h3');
+        h3.textContent = 'Access Logs';
+        const controls = document.createElement('div');
+        controls.className = 'game-controls';
+        const closeBtn = document.createElement('button');
+        closeBtn.className = 'game-btn';
+        closeBtn.id = 'closeLogs';
+        const icon = document.createElement('i');
+        icon.className = 'fas fa-times';
+        closeBtn.appendChild(icon);
+        closeBtn.onclick = () => modal.remove();
+        controls.appendChild(closeBtn);
+        header.appendChild(h3);
+        header.appendChild(controls);
+        modalContent.appendChild(header);
+        modalContent.appendChild(pre);
+        modal.appendChild(modalContent);
+        document.body.appendChild(modal);
+    } catch (e) {
+        console.error('Error showing access logs:', e);
+        alert('Error showing logs: ' + e.message);
+    }
 }
 
 function downloadAccessLogs() {
-    const logs = getAccessLogs();
-    const blob = new Blob([JSON.stringify(logs)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = 'access-logs.json';
-    document.body.appendChild(a); a.click(); a.remove();
-    URL.revokeObjectURL(url);
+    console.log('downloadAccessLogs called'); // Debug
+    try {
+        const logs = getAccessLogs();
+        const blob = new Blob([JSON.stringify(logs)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = 'access-logs.json';
+        document.body.appendChild(a); a.click(); a.remove();
+        URL.revokeObjectURL(url);
+    } catch (e) {
+        console.error('Error downloading logs:', e);
+        alert('Error downloading logs: ' + e.message);
+    }
 }
 
 function clearAccessLogs() {
-    localStorage.removeItem(ACCESS_LOGS_KEY);
-    const countEl = document.getElementById('accessLogCount');
-    if (countEl) countEl.textContent = 'Logs: 0';
+    console.log('clearAccessLogs called'); // Debug
+    try {
+        localStorage.removeItem(ACCESS_LOGS_KEY);
+        const countEl = document.getElementById('accessLogCount');
+        if (countEl) countEl.textContent = 'Logs: 0';
+        alert('Client logs cleared');
+    } catch (e) {
+        console.error('Error clearing logs:', e);
+        alert('Error clearing logs: ' + e.message);
+    }
 }
 
 async function showServerLogs() {
-    // Get token from user (stored in localStorage for convenience)
-    let token = localStorage.getItem('logs-token');
-    if (!token) {
-        token = prompt('Enter access token to view logs:');
-        if (!token) return;
-        localStorage.setItem('logs-token', token);
+    console.log('showServerLogs called'); // Debug
+    try {
+        // Get token from user (stored in localStorage for convenience)
+        let token = localStorage.getItem('logs-token');
+        if (!token) {
+            token = prompt('Enter access token to view logs:');
+            if (!token) {
+                console.log('No token provided, cancelled');
+                return;
+            }
+            localStorage.setItem('logs-token', token);
+        }
+        // Open logs directly in new window as JSON
+        const url = `access-logs.php?action=show&limit=2000&token=${encodeURIComponent(token)}`;
+        console.log('Opening logs URL:', url.replace(/token=[^&]+/, 'token=***')); // Hide token in log
+        window.open(url, '_blank');
+    } catch (e) {
+        console.error('Error showing server logs:', e);
+        alert('Error opening server logs: ' + e.message);
     }
-    // Open logs directly in new window as JSON
-    window.open(`access-logs.php?action=show&limit=2000&token=${encodeURIComponent(token)}`, '_blank');
 }
 
 async function clearServerLogs() {
@@ -2228,3 +2316,10 @@ async function clearServerLogs() {
         alert('Failed to clear server logs');
     }
 }
+
+// Ensure functions are in global scope for onclick handlers
+window.showAccessLogs = showAccessLogs;
+window.downloadAccessLogs = downloadAccessLogs;
+window.clearAccessLogs = clearAccessLogs;
+window.showServerLogs = showServerLogs;
+window.clearServerLogs = clearServerLogs;
