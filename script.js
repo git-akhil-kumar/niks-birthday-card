@@ -1177,6 +1177,18 @@ function closeTripModal() {
 	}
 }
 
+// Security: HTML escape function to prevent XSS
+function escapeHtml(text) {
+    const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    };
+    return String(text).replace(/[&<>"']/g, m => map[m]);
+}
+
 function addNewTrip() {
 	const date = document.getElementById("tripDate").value;
 	const title = document.getElementById("tripTitle").value;
@@ -1189,13 +1201,19 @@ function addNewTrip() {
 		return;
 	}
 
+	// Validate and sanitize inputs
+	const safeTitle = escapeHtml(title.substring(0, 100));
+	const safeLocation = escapeHtml(location.substring(0, 100));
+	const safeDescription = escapeHtml(description.substring(0, 500));
+	const safeDate = escapeHtml(date);
+
 	// Create new timeline item
 	const timeline = document.querySelector(".timeline");
 	const newTripItem = document.createElement("div");
 	newTripItem.className = "timeline-item future";
-	newTripItem.setAttribute("data-date", date);
+	newTripItem.setAttribute("data-date", safeDate);
 
-	// Get icon based on type
+	// Get icon based on type - validate against whitelist
 	const iconMap = {
 		plane: "fas fa-plane",
 		car: "fas fa-car",
@@ -1209,26 +1227,57 @@ function addNewTrip() {
 
 	const iconClass = iconMap[type] || "fas fa-heart";
 
-	newTripItem.innerHTML = `
-        <div class="timeline-marker">
-            <i class="${iconClass}"></i>
-        </div>
-        <div class="timeline-content">
-            <div class="timeline-date">${formatDate(date)}</div>
-            <h3 class="timeline-title">${title}</h3>
-            <div class="timeline-location">
-                <i class="fas fa-map-marker-alt"></i>
-                <span>${location}</span>
-            </div>
-            <p class="timeline-description">${description}</p>
-            <div class="timeline-photos">
-                <div class="photo-placeholder future">
-                    <i class="fas fa-calendar-plus"></i>
-                    <span>Planning in progress...</span>
-                </div>
-            </div>
-        </div>
-    `;
+	// Use textContent/text nodes instead of innerHTML for user input
+	const marker = document.createElement("div");
+	marker.className = "timeline-marker";
+	const icon = document.createElement("i");
+	icon.className = iconClass;
+	marker.appendChild(icon);
+
+	const content = document.createElement("div");
+	content.className = "timeline-content";
+	
+	const dateEl = document.createElement("div");
+	dateEl.className = "timeline-date";
+	dateEl.textContent = formatDate(safeDate);
+	
+	const titleEl = document.createElement("h3");
+	titleEl.className = "timeline-title";
+	titleEl.textContent = safeTitle;
+	
+	const locationDiv = document.createElement("div");
+	locationDiv.className = "timeline-location";
+	const locIcon = document.createElement("i");
+	locIcon.className = "fas fa-map-marker-alt";
+	locationDiv.appendChild(locIcon);
+	const locSpan = document.createElement("span");
+	locSpan.textContent = safeLocation;
+	locationDiv.appendChild(locSpan);
+	
+	const descEl = document.createElement("p");
+	descEl.className = "timeline-description";
+	descEl.textContent = safeDescription;
+	
+	const photosDiv = document.createElement("div");
+	photosDiv.className = "timeline-photos";
+	const placeholder = document.createElement("div");
+	placeholder.className = "photo-placeholder future";
+	const calIcon = document.createElement("i");
+	calIcon.className = "fas fa-calendar-plus";
+	placeholder.appendChild(calIcon);
+	const span = document.createElement("span");
+	span.textContent = "Planning in progress...";
+	placeholder.appendChild(span);
+	photosDiv.appendChild(placeholder);
+
+	content.appendChild(dateEl);
+	content.appendChild(titleEl);
+	content.appendChild(locationDiv);
+	content.appendChild(descEl);
+	content.appendChild(photosDiv);
+	
+	newTripItem.appendChild(marker);
+	newTripItem.appendChild(content);
 
 	// Insert at the end of timeline
 	timeline.insertBefore(newTripItem, timeline.querySelector(".timeline-footer"));
@@ -2149,28 +2198,32 @@ function clearAccessLogs() {
 }
 
 async function showServerLogs() {
-    try {
-        const res = await fetch('access-logs.php?action=show&limit=200');
-        const data = await res.json();
-        const logs = data.logs || [];
-        const pre = document.createElement('pre');
-        pre.textContent = JSON.stringify(logs, null, 2);
-        pre.style.cssText = 'max-height:50vh;overflow:auto;background:#111;color:#eee;padding:1rem;border-radius:10px;';
-        const modal = document.createElement('div');
-        modal.className = 'game-modal active';
-        modal.innerHTML = '<div class="game-modal-content"><div class="game-header"><h3>Server Logs</h3><div class="game-controls"><button class="game-btn" id="closeSrvLogs"><i class="fas fa-times"></i></button></div></div></div>';
-        modal.querySelector('.game-modal-content').appendChild(pre);
-        document.body.appendChild(modal);
-        modal.querySelector('#closeSrvLogs').onclick = () => modal.remove();
-    } catch (e) {
-        alert('Failed to load server logs');
+    // Get token from user (stored in localStorage for convenience)
+    let token = localStorage.getItem('logs-token');
+    if (!token) {
+        token = prompt('Enter access token to view logs:');
+        if (!token) return;
+        localStorage.setItem('logs-token', token);
     }
+    // Open logs directly in new window as JSON
+    window.open(`access-logs.php?action=show&limit=2000&token=${encodeURIComponent(token)}`, '_blank');
 }
 
 async function clearServerLogs() {
+    let token = localStorage.getItem('logs-token');
+    if (!token) {
+        token = prompt('Enter access token to clear logs:');
+        if (!token) return;
+        localStorage.setItem('logs-token', token);
+    }
     try {
-        await fetch('access-logs.php?action=clear');
-        alert('Server logs cleared');
+        const res = await fetch(`access-logs.php?action=clear&token=${encodeURIComponent(token)}`);
+        const data = await res.json();
+        if (data.ok) {
+            alert('Server logs cleared');
+        } else {
+            alert('Failed: ' + (data.error || 'unauthorized'));
+        }
     } catch (e) {
         alert('Failed to clear server logs');
     }

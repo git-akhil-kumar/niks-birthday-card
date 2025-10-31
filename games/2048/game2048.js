@@ -30,6 +30,7 @@ function init2048() {
     addRandomTile();
     render2048();
     update2048Score();
+    setup2048Controls(); // Re-setup touch on init
 }
 
 function loadBestScore() {
@@ -364,41 +365,54 @@ function handle2048KeyPress(e) {
     }
 }
 
-// Setup keyboard controls
+// Setup keyboard and touch controls
+function setup2048Controls() {
+    const area = document.getElementById('game2048Area');
+    if (!area) return;
+    
+    // Remove old listeners if any
+    const oldStart = area._touchStart2048;
+    const oldEnd = area._touchEnd2048;
+    if (oldStart) area.removeEventListener('touchstart', oldStart);
+    if (oldEnd) area.removeEventListener('touchend', oldEnd);
+
+    // Touch controls (swipe) - reattached on each init
+    const touchStart = (e) => {
+        const modal = document.getElementById('game2048Modal');
+        if (!modal || !modal.classList.contains('active')) return;
+        if (!e.touches || e.touches.length === 0) return;
+        game2048.touchStartX = e.touches[0].clientX;
+        game2048.touchStartY = e.touches[0].clientY;
+        e.preventDefault();
+    };
+    const touchEnd = (e) => {
+        const modal = document.getElementById('game2048Modal');
+        if (!modal || !modal.classList.contains('active')) return;
+        if (!e.changedTouches || e.changedTouches.length === 0) return;
+        const dx = e.changedTouches[0].clientX - game2048.touchStartX;
+        const dy = e.changedTouches[0].clientY - game2048.touchStartY;
+        const absDx = Math.abs(dx);
+        const absDy = Math.abs(dy);
+        const minSwipe = 30; // Increased for mobile
+        if (absDx < minSwipe && absDy < minSwipe) return;
+        if (absDx > absDy) {
+            move2048(dx > 0 ? 'right' : 'left');
+        } else {
+            move2048(dy > 0 ? 'down' : 'up');
+        }
+        e.preventDefault();
+    };
+    
+    area._touchStart2048 = touchStart;
+    area._touchEnd2048 = touchEnd;
+    area.addEventListener('touchstart', touchStart, { passive: false });
+    area.addEventListener('touchend', touchEnd, { passive: false });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     // Listen on document so arrows work without focusing the modal
     document.addEventListener('keydown', handle2048KeyPress);
-
-    // Touch controls (swipe)
-    const area = document.getElementById('game2048Area');
-    if (area) {
-        area.addEventListener('touchstart', (e) => {
-            const modal = document.getElementById('game2048Modal');
-            if (!modal || !modal.classList.contains('active')) return;
-            if (!e.touches || e.touches.length === 0) return;
-            game2048.touchStartX = e.touches[0].clientX;
-            game2048.touchStartY = e.touches[0].clientY;
-            e.preventDefault();
-        }, { passive: false });
-
-        area.addEventListener('touchend', (e) => {
-            const modal = document.getElementById('game2048Modal');
-            if (!modal || !modal.classList.contains('active')) return;
-            if (!e.changedTouches || e.changedTouches.length === 0) return;
-            const dx = e.changedTouches[0].clientX - game2048.touchStartX;
-            const dy = e.changedTouches[0].clientY - game2048.touchStartY;
-            const absDx = Math.abs(dx);
-            const absDy = Math.abs(dy);
-            const minSwipe = 20;
-            if (absDx < minSwipe && absDy < minSwipe) return;
-            if (absDx > absDy) {
-                move2048(dx > 0 ? 'right' : 'left');
-            } else {
-                move2048(dy > 0 ? 'down' : 'up');
-            }
-            e.preventDefault();
-        }, { passive: false });
-    }
+    setup2048Controls();
 });
 
 window.init2048 = init2048;

@@ -15,6 +15,7 @@ let breakout = {
     keyHandler: null,
     keyUpHandler: null,
     mouseHandler: null,
+    touchHandler: null,
     keyLeft: false,
     keyRight: false,
     paddleSpeed: 10
@@ -90,6 +91,20 @@ function setupBreakoutControls() {
         breakout.paddleX = Math.max(0, Math.min(breakout.canvas.width - 120, breakout.paddleX));
     };
     breakout.canvas.addEventListener('mousemove', breakout.mouseHandler);
+
+    // Touch controls for mobile
+    breakout.touchHandler = (e) => {
+        const modal = document.getElementById('breakoutModal');
+        if (!modal || !modal.classList.contains('active')) return;
+        e.preventDefault();
+        const rect = breakout.canvas.getBoundingClientRect();
+        const touch = e.touches && e.touches.length > 0 ? e.touches[0] : (e.changedTouches && e.changedTouches.length > 0 ? e.changedTouches[0] : null);
+        if (!touch) return;
+        breakout.paddleX = touch.clientX - rect.left - 60;
+        breakout.paddleX = Math.max(0, Math.min(breakout.canvas.width - 120, breakout.paddleX));
+    };
+    breakout.canvas.addEventListener('touchmove', breakout.touchHandler, { passive: false });
+    breakout.canvas.addEventListener('touchstart', breakout.touchHandler, { passive: false });
 }
 
 function cleanupBreakoutControls() {
@@ -104,6 +119,11 @@ function cleanupBreakoutControls() {
     if (breakout.canvas && breakout.mouseHandler) {
         breakout.canvas.removeEventListener('mousemove', breakout.mouseHandler);
         breakout.mouseHandler = null;
+    }
+    if (breakout.canvas && breakout.touchHandler) {
+        breakout.canvas.removeEventListener('touchmove', breakout.touchHandler);
+        breakout.canvas.removeEventListener('touchstart', breakout.touchHandler);
+        breakout.touchHandler = null;
     }
 }
 

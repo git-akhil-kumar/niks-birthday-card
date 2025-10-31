@@ -87,8 +87,23 @@
 }
 
 @media (max-width: 600px) {
+    .game2048-container {
+        padding: 1rem;
+        max-width: 100%;
+    }
+    #game2048Area {
+        gap: 6px;
+        padding: 6px;
+    }
     .tile-2048 {
         font-size: 1.2rem;
+        border-radius: 2px;
+    }
+    .tile-128, .tile-256, .tile-512 {
+        font-size: 1rem;
+    }
+    .tile-1024, .tile-2048 {
+        font-size: 0.9rem;
     }
 }
 
